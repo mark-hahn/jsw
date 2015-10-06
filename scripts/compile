@@ -1,0 +1,3 @@
+cd ~/dev/apps/jsw
+echo "Compiling JSW"
+coffee -co lib src/*.coffee

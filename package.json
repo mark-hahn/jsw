@@ -20,19 +20,15 @@
     "url": "https://github.com/mark-hahn/jsw/issues"
   },
   "scripts": {
-    "prepublish": "scripts/compile.sh",
-    "test":       "scripts/test.sh"
+    "prepublish": "scripts/compile"
   },
   "homepage": "https://github.com/mark-hahn/jsw",
-  "devDependencies": {
-    "jasmine": "^2.3.2"
-  },
   "dependencies": {
     "argparse": "^1.0.2",
     "debug": "^2.2.0"
   },
   "bin": {
-    "jsw": "scripts/run.sh"
+    "jsw": "scripts/run"
   },
   "preferGlobal": "true"
 }
