@@ -84,9 +84,9 @@ function func1 (arg1, arg2) {
 
 When JS is converted to JSW, a compact set of metadata is added to the bottom of JSW as a comment.  This is very similar to how Coffeescript provides a source map.  If support for exact JS text matching is not required this can be disabled.  In general it can be ignored and the Atom package JSW will hide that metadata when editing.
 
-### Status
+### Status is Pre-Alpha
 
-You are looking at it.  No coding has started.  Even this readme is a work-in-progress.
+Coding in progress.  Nothing useful yet.
 
 ### License
 

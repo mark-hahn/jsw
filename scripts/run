@@ -1,2 +1,7 @@
+#   -*-  grammar-ext: sh  -*-
+
+set -e
 cd ~/dev/apps/jsw
+scripts/compile
 node lib/jsw.js "$@"
+exit 0  # $?

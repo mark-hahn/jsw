@@ -1,0 +1,18 @@
+#   -*-  grammar-ext: sh  -*-
+
+DIRECTORY_TO_OBSERVE="$1"
+function block_for_change {
+  # inotifywait -r -e modify,move,create,delete $DIRECTORY_TO_OBSERVE
+  inotifywait -qq $DIRECTORY_TO_OBSERVE
+}
+count=0
+BUILD_SCRIPT="$2"
+function build {
+  count=$((count+1))
+  bash $BUILD_SCRIPT
+}
+build
+while block_for_change; do
+  echo "Watch Fired $count"
+  build
+done

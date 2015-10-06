@@ -1,3 +1,6 @@
+#   -*-  grammar-ext: sh  -*-
+
+set -e
 cd ~/dev/apps/jsw
-echo "Compiling JSW"
+# echo "Compiling JSW"
 coffee -co lib src/*.coffee
