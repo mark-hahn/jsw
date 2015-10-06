@@ -1,0 +1,37 @@
+{
+  "name": "jsw",
+  "version": "0.0.1",
+  "description": "Alternative Javascript syntax that uses significant whitespace",
+  "main": "lib/jsw.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mark-hahn/jsw"
+  },
+  "keywords": [
+    "jsw",
+    "es6",
+    "javascript",
+    "coffeescript",
+    "translator"
+  ],
+  "author": "Mark Hahn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mark-hahn/jsw/issues"
+  },
+  "scripts": {
+    "prepublish": "scripts/compile.sh"
+  },
+  "homepage": "https://github.com/mark-hahn/jsw",
+  "devDependencies": {
+    "jasmine": "^2.3.2"
+  },
+  "dependencies": {
+    "argparse": "^1.0.2",
+    "debug": "^2.2.0"
+  },
+  "bin": {
+    "jsw": "scripts/run.sh"
+  },
+  "preferGlobal": "true"
+}

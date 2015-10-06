@@ -1,4 +1,4 @@
-# jsw
+# JSW
 
 An alternate version of Javascript syntax that uses significant whitespace
 
@@ -8,26 +8,40 @@ The utility in this repository is a bi-directional translator between JS and JSW
 
 Unlike Coffeescript, JSW does not provide a new language with differing semantics.  It is a thin skin over Javascript that only changes the syntax. This JSW utility is a syntax translator, not a compiler or transpiler. 
 
-JSW is a great way for coffeescript users to migrate to real Javacscript with ES6.
+JSW is a great way for Coffeescript users to migrate to real Javascript with ES6.
 
 ### Sample JSW with translated Javascript
 
+```coffee
+# JSW
+-> func1 arg1, arg2                 
+  var hash1 = key1: val1            
+              key2: val2            
+              key3:                 
+  block                             
+    let x = y                       
+    func2 x                         
+    if q and z                      
+      func1 "This is text spread    
+             over two lines."       
 ```
--> func1 arg1, arg2                 function func1 (arg1, arg2) {
-  var hash1 = key1: val1              var hash1 = {
-              key2: val2                key1: val1,
-              key3:                     key2: val2,
-  block                                 key3: key3
-    let x = y                         }
-    func2 x                           {
-    if q and z                          let x = y;
-      func1 "This is text spread        func2(x);
-             over two lines."           if (q && z) {
-                                          func1("This is text spread " +
-                                                "over two lines.");
-                                        }
-                                      }
-                                    }
+```javascript                                    
+// Javascript                                    
+function func1 (arg1, arg2) {
+  var hash1 = {
+    key1: val1,
+    key2: val2,
+    key3: key3
+  }
+  {
+    let x = y;
+    func2(x);
+    if (q && z) {
+      func1("This is text spread " +
+            "over two lines.");
+    }
+  }
+}
 ```
 
 ### JSW Overall Features
@@ -44,8 +58,19 @@ JSW is a great way for coffeescript users to migrate to real Javacscript with ES
 
 - JSW takes advantage of new ES6 features.  The syntax `->` is a replacement for `function` while ES6 provides `=>` with no change in JSW.  The combination of the two matches coffescript.
 
+- You can easily convert from Coffeescript to JSW by first converting to JS and then to JSW.
+
+- Coffeescript highlighting works pretty well with JSW (see sample above)
+
 - An Atom editor extension, coffee-js-translator, is planned that allows opening normal JS, editing in JSW, and saving in the original JS.  This allows working with others who don't even know about JSW.  One does not even need to have JSW files.
 
+### JSW features not in Coffeescript
+
+  - Most of ES6
+  - Simple continuations that can break anywhere, including strings
+  - Blocks
+  - No hashes require braces
+  
 ### Coffeescript features not in JSW
 
   - Some ES6 replacements not as complete (e.g. Classes)
@@ -55,13 +80,10 @@ JSW is a great way for coffeescript users to migrate to real Javacscript with ES
   - Matching ES6 features often have different syntax (e.g. interpolation)
   - Combined comparison (0 < x < 1)
   
-### JSW features not in Coffeescript
+### JSW to JS Text Mapping
 
-  - Much of ES6
-  - Simple continuations that can break anywhere, including strings
-  - Blocks
-  - No hashes require braces
-  
+When JS is converted to JSW, a compact set of metadata is added to the bottom of JSW as a comment.  This is very similar to how Coffeescript provides a source map.  If support for exact JS text matching is not required this can be disabled.  In general it can be ignored and the Atom package JSW will hide that metadata when editing.
+
 ### Status
 
 You are looking at it.  No coding has started.  Even this readme is a work-in-progress.
