@@ -1,0 +1,5 @@
+[ { type: 'Block',
+    value: ' comment ',
+    start: 0,
+    end: 13,
+    range: [ 0, 13 ] } ]

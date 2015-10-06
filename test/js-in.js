@@ -1,6 +1,2 @@
-
-var args, 
-    log;
-args    =       require('./args')
-
-log(args , x);
+/* comment */
+function x(a,b){c()}  
