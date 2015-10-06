@@ -20,7 +20,8 @@
     "url": "https://github.com/mark-hahn/jsw/issues"
   },
   "scripts": {
-    "prepublish": "scripts/compile.sh"
+    "prepublish": "scripts/compile.sh",
+    "test":       "scripts/test.sh"
   },
   "homepage": "https://github.com/mark-hahn/jsw",
   "devDependencies": {
