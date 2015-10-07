@@ -1,15 +1,14 @@
 #   -*-  grammar-ext: sh  -*-
 
 function block_for_change {
-  inotifywait -q src/* test/js-in.js
+  if [[ $(<"test/runarg") == genonly ]]
+    then 
+      echo "watching gen only"
+      inotifywait -qe modify src/* scripts/run test/*-in.js test/*-in-ast.json
+    else inotifywait -qe modify src/* scripts/run test/*-in.js
+  fi
 }
-# count=0
-# function build {
-#   # count=$((count+1))
-#   # echo "$count"
-#   bash scripts/run
-# }
-bash scripts/run
+bash scripts/run $(<"test/runarg")
 while block_for_change; do
-  bash scripts/run
+  bash scripts/run $(<"test/runarg")
 done

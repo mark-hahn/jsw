@@ -1,7 +1,13 @@
 #   -*-  grammar-ext: sh  -*-
-
+ 
 set -e
 cd ~/dev/apps/jsw
-scripts/compile
-node lib/jsw.js "$@"
+scripts/compile 
+export DEBUG=*
+if [[ $1 == genonly ]]
+  then 
+    echo "running gen only"
+    node lib/jsw.js -g  js
+  else node lib/jsw.js -pg js
+fi
 exit 0  # $?

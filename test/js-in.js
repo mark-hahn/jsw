@@ -1,2 +1,1 @@
-/* comment */
-function x(a,b){c()}  
+function x(){}
