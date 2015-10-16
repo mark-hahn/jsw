@@ -1,12 +1,16 @@
 #   -*-  grammar-ext: sh  -*-
 
 function block_for_change {
-  if [[ $(<"test/runarg") == genonly ]]
-    then 
-      echo "watching gen only"
-      inotifywait -qe modify src/* scripts/run test/*-in.js test/*-in-ast.json
-    else inotifywait -qe modify src/* scripts/run test/*-in.js
+  if [[ $(<"test/runarg") == genonly ]]; then 
+    echo "watching gen only"
+    inotifywait -qe modify src/* scripts/run test/*-in.js test/*-in-ast.json
+  else if [[ $(<"test/runarg") == parseonly ]]; then 
+    echo "watching parse only"
+    inotifywait -qe modify src/* scripts/run test/*-in.js
+  else 
+    inotifywait -qe modify src/* scripts/run test/*-in.js
   fi
+fi
 }
 bash scripts/run $(<"test/runarg")
 while block_for_change; do
