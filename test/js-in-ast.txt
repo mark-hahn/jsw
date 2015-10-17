@@ -1,0 +1,186 @@
+<object:0:10>
+   _type: <string> Program
+   _firstChild: <object:1:12>
+      _type: <string> FunctionDeclaration
+      _firstChild: <object:2:13>
+         _type: <string> Keyword
+         _firstChild: <null>
+         _lastChild: <null>
+         _parentElement: <object:1:12> *duplicate*
+         _nextSibling: <object:3:13>
+            _type: <string> Whitespace
+            _firstChild: <null>
+            _lastChild: <null>
+            _parentElement: <object:1:12> *duplicate*
+            _nextSibling: <object:4:8>
+               _type: <string> Identifier
+               _firstChild: <object:5:13>
+                  _type: <string> Identifier
+                  _firstChild: <null>
+                  _lastChild: <null>
+                  _parentElement: <object:4:8> *duplicate*
+                  _nextSibling: <null>
+                  _previousSibling: <null>
+                  _childElements: <array:6:0>
+                  _value: <string> a
+                  _sourceCode: <string> a
+                  _sourceCodeLength: <number> 1
+                  _sourceCodeLines: <array:7:1>
+                     0: <string> a
+                  _isComment: <boolean> false
+                  _isWhitespace: <boolean> false
+               _lastChild: <object:5:13> *duplicate*
+               _parentElement: <object:1:12> *duplicate*
+               _nextSibling: <object:8:13>
+                  _type: <string> Punctuator
+                  _firstChild: <null>
+                  _lastChild: <null>
+                  _parentElement: <object:1:12> *duplicate*
+                  _nextSibling: <object:9:13>
+                     _type: <string> Punctuator
+                     _firstChild: <null>
+                     _lastChild: <null>
+                     _parentElement: <object:1:12> *duplicate*
+                     _nextSibling: <object:10:8>
+                        _type: <string> BlockStatement
+                        _firstChild: <object:11:13>
+                           _type: <string> Punctuator
+                           _firstChild: <null>
+                           _lastChild: <null>
+                           _parentElement: <object:10:8> *duplicate*
+                           _nextSibling: <object:12:13>
+                              _type: <string> Punctuator
+                              _firstChild: <null>
+                              _lastChild: <null>
+                              _parentElement: <object:10:8> *duplicate*
+                              _nextSibling: <null>
+                              _previousSibling: <object:11:13> *duplicate*
+                              _childElements: <array:13:0>
+                              _value: <string> }
+                              _sourceCode: <string> }
+                              _sourceCodeLength: <number> 1
+                              _sourceCodeLines: <array:14:1>
+                                 0: <string> }
+                              _isComment: <boolean> false
+                              _isWhitespace: <boolean> false
+                           _previousSibling: <null>
+                           _childElements: <array:15:0>
+                           _value: <string> {
+                           _sourceCode: <string> {
+                           _sourceCodeLength: <number> 1
+                           _sourceCodeLines: <array:16:1>
+                              0: <string> {
+                           _isComment: <boolean> false
+                           _isWhitespace: <boolean> false
+                        _lastChild: <object:12:13> *duplicate*
+                        _parentElement: <object:1:12> *duplicate*
+                        _nextSibling: <null>
+                        _previousSibling: <object:9:13> *duplicate*
+                        _childElements: <array:17:2>
+                           0: <object:11:13> *duplicate*
+                           1: <object:12:13> *duplicate*
+                        _body: <array:18:0>
+                     _previousSibling: <object:8:13> *duplicate*
+                     _childElements: <array:19:0>
+                     _value: <string> )
+                     _sourceCode: <string> )
+                     _sourceCodeLength: <number> 1
+                     _sourceCodeLines: <array:20:1>
+                        0: <string> )
+                     _isComment: <boolean> false
+                     _isWhitespace: <boolean> false
+                  _previousSibling: <object:4:8> *duplicate*
+                  _childElements: <array:21:0>
+                  _value: <string> (
+                  _sourceCode: <string> (
+                  _sourceCodeLength: <number> 1
+                  _sourceCodeLines: <array:22:1>
+                     0: <string> (
+                  _isComment: <boolean> false
+                  _isWhitespace: <boolean> false
+               _previousSibling: <object:3:13> *duplicate*
+               _childElements: <array:23:1>
+                  0: <object:5:13> *duplicate*
+               _name: <string> a
+            _previousSibling: <object:2:13> *duplicate*
+            _childElements: <array:24:0>
+            _value: <string>  
+            _sourceCode: <string>  
+            _sourceCodeLength: <number> 1
+            _sourceCodeLines: <array:25:1>
+               0: <string>  
+            _isComment: <boolean> false
+            _isWhitespace: <boolean> true
+         _previousSibling: <null>
+         _childElements: <array:26:0>
+         _value: <string> function
+         _sourceCode: <string> function
+         _sourceCodeLength: <number> 8
+         _sourceCodeLines: <array:27:1>
+            0: <string> function
+         _isComment: <boolean> false
+         _isWhitespace: <boolean> false
+      _lastChild: <object:10:8> *duplicate*
+      _parentElement: <object:0:10> *duplicate*
+      _nextSibling: <object:28:13>
+         _type: <string> EOF
+         _firstChild: <null>
+         _lastChild: <null>
+         _parentElement: <object:0:10> *duplicate*
+         _nextSibling: <null>
+         _previousSibling: <object:1:12> *duplicate*
+         _childElements: <array:29:0>
+         _value: <string> 
+         _sourceCode: <string> 
+         _sourceCodeLength: <number> 0
+         _sourceCodeLines: <array:30:1>
+            0: <string> 
+         _isComment: <boolean> false
+         _isWhitespace: <boolean> false
+      _previousSibling: <null>
+      _childElements: <array:31:6>
+         0: <object:2:13> *duplicate*
+         1: <object:3:13> *duplicate*
+         2: <object:4:8> *duplicate*
+         3: <object:8:13> *duplicate*
+         4: <object:9:13> *duplicate*
+         5: <object:10:8> *duplicate*
+      _async: <boolean> false
+      _id: <object:4:8> *duplicate*
+      _params: <array:32:0>
+      _body: <object:10:8> *duplicate*
+      _generator: <boolean> false
+   _lastChild: <object:28:13> *duplicate*
+   _parentElement: <null>
+   _nextSibling: <null>
+   _previousSibling: <null>
+   _childElements: <array:33:2>
+      0: <object:1:12> *duplicate*
+      1: <object:28:13> *duplicate*
+   _body: <array:34:1>
+      0: <object:1:12> *duplicate*
+   _isProgram: <boolean> true
+   _searchIndex: <object:35:2>
+      _nodeIndex: <object:36:1>
+         _index: <object:37:3>
+            FunctionDeclaration: <array:38:1>
+               0: <object:1:12> *duplicate*
+            Identifier: <array:39:1>
+               0: <object:4:8> *duplicate*
+            BlockStatement: <array:40:1>
+               0: <object:10:8> *duplicate*
+      _tokenIndex: <object:41:1>
+         _index: <object:42:5>
+            Keyword: <array:43:1>
+               0: <object:2:13> *duplicate*
+            Whitespace: <array:44:1>
+               0: <object:3:13> *duplicate*
+            Identifier: <array:45:1>
+               0: <object:5:13> *duplicate*
+            Punctuator: <array:46:4>
+               0: <object:8:13> *duplicate*
+               1: <object:9:13> *duplicate*
+               2: <object:11:13> *duplicate*
+               3: <object:12:13> *duplicate*
+            EOF: <array:47:1>
+               0: <object:28:13> *duplicate*
