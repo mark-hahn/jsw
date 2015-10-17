@@ -442,6 +442,7 @@ generateComment = (comment, specialBase) ->
       return result
   return adjustMultilineComment("/*" + comment.value + "*/", specialBase)  if extra.format.indent.adjustMultilineComment and (/[\n\r]/).test(comment.value)
   "/*" + comment.value + "*/"
+  
 addComments = (stmt, result) ->
   i = undefined
   len = undefined
@@ -598,7 +599,6 @@ generateInternal = (node) ->
 ##### MAIN ROUTINE #####
 
 generate = (node, options) ->
-  log 'generate', options
   defaultOptions = getDefaultOptions()
   result = undefined
   pair = undefined
@@ -631,7 +631,6 @@ generate = (node, options) ->
   sourceMap = options.sourceMap
   sourceCode = options.sourceCode
   preserveBlankLines = options.format.preserveBlankLines and sourceCode isnt null
-  log 'options', {options}
   extra = options
   if sourceMap
     unless exports.browser
@@ -659,8 +658,10 @@ CodeGenerator::maybeBlock = (stmt, flags) ->
   noLeadingComment = undefined
   that = this
   noLeadingComment = not extra.comment or not stmt.leadingComments
-  return [ space, @generateStatement(stmt, flags) ]  if stmt.type is Syntax.BlockStatement and noLeadingComment
-  return ";"  if stmt.type is Syntax.EmptyStatement and noLeadingComment
+  if stmt.type is Syntax.BlockStatement and noLeadingComment
+    return [ space, @generateStatement(stmt, flags) ]
+  if stmt.type is Syntax.EmptyStatement and noLeadingComment  
+    return ";"  
   withIndent ->
     result = [ newline, addIndent(that.generateStatement(stmt, flags)) ]
 

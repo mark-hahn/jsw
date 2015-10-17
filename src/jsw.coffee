@@ -30,7 +30,7 @@ for file in args.files
     codegen.attachComments jsInAst, comments, tokens
     fs.writeFileSync pfx + 'in-ast.json', JSON.stringify jsInAst
     
-    generated = genJSW.generate jsInAst, {}
+    generated = genJSW.generate jsInAst, comment: yes
     
     fs.writeFileSync pfx + 'generated.jsw', generated
     
