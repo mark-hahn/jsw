@@ -17,10 +17,10 @@ getArgs = ->
     action: 'storeTrue'
     help: 'Generate .js file from .ast'
  
-  parser.addArgument ['-w', '--tojsw' ], 
+  parser.addArgument ['-f', '--tojsw' ], 
     nargs: 0
     action: 'storeTrue'
-    help: 'Translate .js files to .jsw (default is .jsw to .js).'
+    help: 'Translate .js files to .jsw (forward, default is .jsw to .js).'
  
   parser.addArgument ['-t', '--tokens' ], 
     nargs: 0
@@ -31,6 +31,11 @@ getArgs = ->
     nargs: 0
     action: 'storeTrue'
     help: 'Write comments file.'
+ 
+  parser.addArgument ['-w', '--whitespace' ], 
+    nargs: 0
+    action: 'storeTrue'
+    help: 'Write whitespace file.'
  
   parser.addArgument ['-s', '--safe'  ], 
     nargs: 0

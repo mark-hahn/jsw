@@ -6,12 +6,12 @@ scripts/compile
 export DEBUG=*
 if [[ $1 == genonly ]]; then 
   echo "running gen only"
-  node lib/jsw.js -g  js
+  node lib/jsw.js -gtcw  js
 else if [[ $1 == parseonly ]]; then 
     echo "running parse only"
-    node lib/jsw.js -p  js
+    node lib/jsw.js -ptcw  js
   else 
-    node lib/jsw.js -pg js
-  fi
+    node lib/jsw.js -pgtcw js
+  fi 
 fi
 exit 0  # $?
