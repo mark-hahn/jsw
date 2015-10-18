@@ -16,7 +16,7 @@ getArgs = ->
     nargs: 0
     action: 'storeTrue'
     help: 'Generate .js file from .ast'
- 
+  
   parser.addArgument ['-f', '--tojsw' ], 
     nargs: 0
     action: 'storeTrue'

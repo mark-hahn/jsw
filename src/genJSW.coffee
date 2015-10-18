@@ -105,12 +105,13 @@ isArray = Array.isArray
 unless isArray
   isArray = isArray = (array) ->
     Object::toString.call(array) is "[object Array]"
-    
 
 isExpression = (node) ->
   CodeGenerator.Expression.hasOwnProperty node.type
+  
 isStatement = (node) ->
   CodeGenerator.Statement.hasOwnProperty node.type
+  
 getDefaultOptions = ->
   indent: null
   base: null
@@ -181,7 +182,7 @@ updateDeeply = (target, override) ->
       else
         target[key] = val
   target
-generateNumber = (value) ->
+generateNumber = cT("nerateNumber=value->~184fcT") (value) ->
   result = undefined
   point = undefined
   temp = undefined
@@ -351,44 +352,63 @@ flattenToString = (arr) ->
     result += (if isArray(elem) then flattenToString(elem) else elem)
     ++i
   result
-toSourceNodeWhenNeeded = (generated, node) ->
-  unless sourceMap
+   
+toSourceNodeWhenNeeded = cT("ded=generated,node->~354fcT") (generated, node) ->
+  if not sourceMap
     if isArray(generated)
       return flattenToString(generated)
     else
       return generated
-  unless node?
+  if not node?
     if generated instanceof SourceNode
       return generated
     else
       node = {}
-  return new SourceNode(null, null, sourceMap, generated, node.name or null)  unless node.loc?
-  new SourceNode(node.loc.start.line, node.loc.start.column, (if sourceMap is true then node.loc.source or null else sourceMap), generated, node.name or null)
+  if not node.loc?
+    return new SourceNode(null, null, sourceMap, generated, node.name or null)
+  new SourceNode(node.loc.start.line, node.loc.start.column, 
+                   (if sourceMap is true then node.loc.source or null else sourceMap), 
+                 generated, node.name or null)
+                 
 noEmptySpace = ->
   (if (space) then space else " ")
+  
 join = (left, right) ->
   leftSource = undefined
   rightSource = undefined
   leftCharCode = undefined
   rightCharCode = undefined
   leftSource = toSourceNodeWhenNeeded(left).toString()
-  return [ right ]  if leftSource.length is 0
+  if leftSource.length is 0
+    return [ right ]  
   rightSource = toSourceNodeWhenNeeded(right).toString()
-  return [ left ]  if rightSource.length is 0
+  if rightSource.length is 0
+    return [ left ]  
   leftCharCode = leftSource.charCodeAt(leftSource.length - 1)
   rightCharCode = rightSource.charCodeAt(0)
-  if (leftCharCode is 0x2B or leftCharCode is 0x2D) and leftCharCode is rightCharCode or esutils.code.isIdentifierPartES5(leftCharCode) and esutils.code.isIdentifierPartES5(rightCharCode) or leftCharCode is 0x2F and rightCharCode is 0x69
+  if (leftCharCode is 0x2B or leftCharCode is 0x2D) and leftCharCode is rightCharCode or 
+      esutils.code.isIdentifierPartES5(leftCharCode) and esutils.code.isIdentifierPartES5(rightCharCode) or 
+      leftCharCode is 0x2F and rightCharCode is 0x69
     return [ left, noEmptySpace(), right ]
-  else return [ left, right ]  if esutils.code.isWhiteSpace(leftCharCode) or esutils.code.isLineTerminator(leftCharCode) or esutils.code.isWhiteSpace(rightCharCode) or esutils.code.isLineTerminator(rightCharCode)
+  else 
+    if esutils.code.isWhiteSpace(leftCharCode)     or 
+       esutils.code.isLineTerminator(leftCharCode) or 
+       esutils.code.isWhiteSpace(rightCharCode)    or 
+       esutils.code.isLineTerminator(rightCharCode)
+      return [ left, right ] 
+       
   [ left, space, right ]
+
 addIndent = (stmt) ->
   [ base, stmt ]
+
 withIndent = (fn) ->
   previousBase = undefined
   previousBase = base
   base += indent
   fn base
   base = previousBase
+
 calculateSpaces = (str) ->
   i = undefined
   i = str.length - 1
@@ -396,6 +416,7 @@ calculateSpaces = (str) ->
     break  if esutils.code.isLineTerminator(str.charCodeAt(i))
     --i
   (str.length - 1) - i
+
 adjustMultilineComment = (value, specialBase) ->
   array = undefined
   i = undefined
@@ -563,6 +584,7 @@ generateVerbatimString = (string) ->
     result[i] = newline + base + result[i]
     i++
   result
+  
 generateVerbatim = (expr, precedence) ->
   verbatim = undefined
   result = undefined
@@ -575,9 +597,12 @@ generateVerbatim = (expr, precedence) ->
     prec = (if (verbatim.precedence?) then verbatim.precedence else Precedence.Sequence)
     result = parenthesize(result, prec, precedence)
   toSourceNodeWhenNeeded result, expr
+  
 CodeGenerator = ->
-generateIdentifier = (node) ->
+  
+generateIdentifier = cT("ateIdentifier=node->~579fcT") (node) ->
   toSourceNodeWhenNeeded node.name, node
+  
 generateAsyncPrefix = (node, spaceRequired) ->
   (if node.async then "async" + (if spaceRequired then noEmptySpace() else space) else "")
 generateStarSuffix = (node) ->
@@ -589,22 +614,27 @@ generateMethodPrefix = (prop) ->
     generateAsyncPrefix func, not prop.computed
   else
     (if generateStarSuffix(func) then "*" else "")
-generateInternal = (node) ->
+    
+generateInternal = cT("erateInternal=node->~593fcT") (node) ->
   codegen = undefined
   codegen = new CodeGenerator()
-  return codegen.generateStatement(node, S_TFFF)  if isStatement(node)
-  return codegen.generateExpression(node, Precedence.Sequence, E_TTT)  if isExpression(node)
+  if isStatement(node)
+    return codegen.generateStatement(node, S_TFFF)  
+  if isExpression(node)
+    return codegen.generateExpression(node, Precedence.Sequence, E_TTT)  
   throw new Error("Unknown node type: " + node.type)
-  
+   
 ##### MAIN ROUTINE #####
-
-generate = (node, options) ->
+ 
+generate = cT("erate=node,options->~601fcT") (node, options) ->
   defaultOptions = getDefaultOptions()
   result = undefined
   pair = undefined
   if options?
-    defaultOptions.format.indent.style = options.indent  if typeof options.indent is "string"
-    defaultOptions.format.indent.base = options.base  if typeof options.base is "number"
+    if typeof options.indent is "string"
+      defaultOptions.format.indent.style = options.indent
+    if typeof options.base is "number"  
+      defaultOptions.format.indent.base = options.base  
     options = updateDeeply(defaultOptions, options)
     indent = options.format.indent.style
     if typeof options.base is "string"
@@ -622,7 +652,8 @@ generate = (node, options) ->
   escapeless = options.format.escapeless
   newline = options.format.newline
   space = options.format.space
-  newline = space = indent = base = ""  if options.format.compact
+  if options.format.compact
+    newline = space = indent = base = ""  
   parentheses = options.format.parentheses
   semicolons = options.format.semicolons
   safeConcatenation = options.format.safeConcatenation
@@ -632,28 +663,34 @@ generate = (node, options) ->
   sourceCode = options.sourceCode
   preserveBlankLines = options.format.preserveBlankLines and sourceCode isnt null
   extra = options
+  
   if sourceMap
-    unless exports.browser
+    if not exports.browser
       SourceNode = require("source-map").SourceNode
     else
       SourceNode = global.sourceMap.SourceNode
-  result = generateInternal(node)
-  unless sourceMap
+      
+  result = cT("result=             ~642acT") generateInternal(node)
+  
+  if not sourceMap
     pair =
       code: result.toString()
       map: null
-
     return (if options.sourceMapWithCode then pair else pair.code)
+    
   pair = result.toStringWithSourceMap(
     file: options.file
     sourceRoot: options.sourceMapRoot
   )
-  pair.map.setSourceContent options.sourceMap, options.sourceContent  if options.sourceContent
-  return pair  if options.sourceMapWithCode
+  if options.sourceContent
+    pair.map.setSourceContent options.sourceMap, options.sourceContent
+  if options.sourceMapWithCode  
+    return pair  
+    
   pair.map.toString()
 
     
-CodeGenerator::maybeBlock = (stmt, flags) ->
+CodeGenerator::maybeBlock = cT("beBlock=stmt,flags->~656fcT") (stmt, flags) ->
   result = undefined
   noLeadingComment = undefined
   that = this
@@ -667,17 +704,17 @@ CodeGenerator::maybeBlock = (stmt, flags) ->
 
   result
 
-CodeGenerator::maybeBlockSuffix = (stmt, result) ->
+CodeGenerator::maybeBlockSuffix = cT("Suffix=stmt,result->~670fcT") (stmt, result) ->
   ends = endsWithLineTerminator(toSourceNodeWhenNeeded(result).toString())
   return [ result, space ]  if stmt.type is Syntax.BlockStatement and (not extra.comment or not stmt.leadingComments) and not ends
   return [ result, base ]  if ends
   [ result, newline, base ]
 
-CodeGenerator::generatePattern = (node, precedence, flags) ->
+CodeGenerator::generatePattern = cT("e,precedence,flags->~676fcT") (node, precedence, flags) ->
   return generateIdentifier(node)  if node.type is Syntax.Identifier
   @generateExpression node, precedence, flags
 
-CodeGenerator::generateFunctionParams = (node) ->
+CodeGenerator::generateFunctionParams = cT("unctionParams=node->~680fcT") (node) ->
   i = undefined
   iz = undefined
   result = undefined
@@ -706,7 +743,7 @@ CodeGenerator::generateFunctionParams = (node) ->
     result.push ")"
   result
 
-CodeGenerator::generateFunctionBody = (node) ->
+CodeGenerator::generateFunctionBody = cT("eFunctionBody=node->~709fcT") (node) ->
   result = undefined
   expr = undefined
   result = @generateFunctionParams(node)
@@ -745,33 +782,40 @@ CodeGenerator::generatePropertyKey = (expr, computed) ->
   result.push "]"  if computed
   result
 
-CodeGenerator::generateAssignment = (left, right, operator, precedence, flags) ->
+CodeGenerator::generateAssignment = cT("r,precedence,flags->~748fcT") (left, right, operator, precedence, flags) ->
   flags |= F_ALLOW_IN  if Precedence.Assignment < precedence
   parenthesize [ @generateExpression(left, Precedence.Call, flags), space + operator + space, @generateExpression(right, Precedence.Assignment, flags) ], Precedence.Assignment, precedence
 
 CodeGenerator::semicolon = (flags) ->
   return ""  if not semicolons and flags & F_SEMICOLON_OPT
   ";"
-
+  
+  
 CodeGenerator.Statement =
-  BlockStatement: (stmt, flags) ->
+  
+
+################ output block { } ##############
+
+  BlockStatement: cT("atement:stmt,flags->~757fcT") (stmt, flags) ->
     range = undefined
     content = undefined
-    result = [ "{", newline ]
+    result = cT("result=             ~791acT") [ "{", newline ]
     that = this
     withIndent ->
       if stmt.body.length is 0 and preserveBlankLines
         range = stmt.range
         if range[1] - range[0] > 2
           content = sourceCode.substring(range[0] + 1, range[1] - 1)
-          result = [ "{" ]  if content[0] is "\n"
+          if content[0] is "\n"
+            result = cT("result=             ~798acT") [ "{" ]  
           result.push content
       i = undefined
       iz = undefined
       fragment = undefined
       bodyFlags = undefined
       bodyFlags = S_TFFF
-      bodyFlags |= F_DIRECTIVE_CTX  if flags & F_FUNC_BODY
+      if flags & F_FUNC_BODY
+        bodyFlags |= F_DIRECTIVE_CTX  
       i = 0
       iz = stmt.body.length
 
@@ -781,25 +825,34 @@ CodeGenerator.Statement =
             if stmt.body[0].leadingComments
               range = stmt.body[0].leadingComments[0].extendedRange
               content = sourceCode.substring(range[0], range[1])
-              result = [ "{" ]  if content[0] is "\n"
-            generateBlankLines stmt.range[0], stmt.body[0].range[0], result  unless stmt.body[0].leadingComments
-          generateBlankLines stmt.body[i - 1].range[1], stmt.body[i].range[0], result  if not stmt.body[i - 1].trailingComments and not stmt.body[i].leadingComments  if i > 0
-        bodyFlags |= F_SEMICOLON_OPT  if i is iz - 1
+              if content[0] is "\n"
+                result = cT("result=             ~815acT") [ "{" ]  
+            if not stmt.body[0].leadingComments
+              generateBlankLines stmt.range[0], stmt.body[0].range[0], result
+          if not stmt.body[i - 1].trailingComments and not stmt.body[i].leadingComments  
+            if i > 0    
+              generateBlankLines stmt.body[i - 1].range[1], stmt.body[i].range[0], result
+        if i is iz - 1  
+          bodyFlags |= F_SEMICOLON_OPT  
         if stmt.body[i].leadingComments and preserveBlankLines
           fragment = that.generateStatement(stmt.body[i], bodyFlags)
         else
           fragment = addIndent(that.generateStatement(stmt.body[i], bodyFlags))
         result.push fragment
-        unless endsWithLineTerminator(toSourceNodeWhenNeeded(fragment).toString())
+        if not endsWithLineTerminator(toSourceNodeWhenNeeded(fragment).toString())
           if preserveBlankLines and i < iz - 1
-            result.push newline  unless stmt.body[i + 1].leadingComments
+            if not stmt.body[i + 1].leadingComments
+              result.push newline 
           else
             result.push newline
-        generateBlankLines stmt.body[i].range[1], stmt.range[1], result  unless stmt.body[i].trailingComments  if i is iz - 1  if preserveBlankLines
+        if preserveBlankLines and i is iz - 1 and not stmt.body[i].trailingComments  
+          generateBlankLines stmt.body[i].range[1], stmt.range[1], result  
         ++i
 
     result.push addIndent("}")
     result
+
+
 
   BreakStatement: (stmt, flags) ->
     return "break " + stmt.label.name + @semicolon(flags)  if stmt.label
@@ -865,7 +918,7 @@ CodeGenerator.Statement =
   DebuggerStatement: (stmt, flags) ->
     "debugger" + @semicolon(flags)
 
-  EmptyStatement: (stmt, flags) ->
+  EmptyStatement: cT("atement:stmt,flags->~868fcT") (stmt, flags) ->
     ";"
 
   ExportDeclaration: (stmt, flags) ->
@@ -916,7 +969,7 @@ CodeGenerator.Statement =
   ExportNamedDeclaration: (stmt, flags) ->
     @ExportDeclaration stmt, flags
 
-  ExpressionStatement: (stmt, flags) ->
+  ExpressionStatement: cT("atement:stmt,flags->~919fcT") (stmt, flags) ->
     isClassPrefixed = (fragment) ->
       code = undefined
       return false  if fragment.slice(0, 5) isnt "class"
@@ -935,7 +988,7 @@ CodeGenerator.Statement =
       return false  unless esutils.code.isWhiteSpace(fragment.charCodeAt(5))
       i = 6
       iz = fragment.length
-
+ 
       while i < iz
         break  unless esutils.code.isWhiteSpace(fragment.charCodeAt(i))
         ++i
@@ -993,13 +1046,13 @@ CodeGenerator.Statement =
           result.push base + "}" + space
     result = join(result, [ "from" + space, @generateExpression(stmt.source, Precedence.Sequence, E_TTT), @semicolon(flags) ])
     result
-
-  VariableDeclarator: (stmt, flags) ->
+ 
+  VariableDeclarator: cT("larator:stmt,flags->~997fcT") (stmt, flags) ->
     itemFlags = (if (flags & F_ALLOW_IN) then E_TTT else E_FTT)
     return [ @generateExpression(stmt.id, Precedence.Assignment, itemFlags), space, "=", space, @generateExpression(stmt.init, Precedence.Assignment, itemFlags) ]  if stmt.init
     @generatePattern stmt.id, Precedence.Assignment, itemFlags
 
-  VariableDeclaration: (stmt, flags) ->
+  VariableDeclaration: cT("aration:stmt,flags->~1002fcT") (stmt, flags) ->
     block = ->
       node = stmt.declarations[0]
       if extra.comment and node.leadingComments
@@ -1130,7 +1183,7 @@ CodeGenerator.Statement =
 
     result
 
-  IfStatement: (stmt, flags) ->
+  IfStatement: cT("atement:stmt,flags->~1133fcT") (stmt, flags) ->
     result = undefined
     bodyFlags = undefined
     semicolonOptional = undefined
@@ -1152,7 +1205,7 @@ CodeGenerator.Statement =
       result.push @maybeBlock(stmt.consequent, bodyFlags)
     result
 
-  ForStatement: (stmt, flags) ->
+  ForStatement: cT("atement:stmt,flags->~1155fcT") (stmt, flags) ->
     result = undefined
     that = this
     withIndent ->
@@ -1173,26 +1226,31 @@ CodeGenerator.Statement =
         result.push ";"
       if stmt.update
         result.push space
-        result.push that.generateExpression(stmt.update, Precedence.Sequence, E_TTT)
+        result.push that.generateExpression(stmt.update, 
+                                            Precedence.Sequence, E_TTT)
         result.push ")"
       else
         result.push ")"
 
-    result.push @maybeBlock(stmt.body, (if flags & F_SEMICOLON_OPT then S_TFFT else S_TFFF))
+    result.push @maybeBlock(stmt.body, 
+      (if flags & F_SEMICOLON_OPT then S_TFFT else S_TFFF))
     result
 
   ForInStatement: (stmt, flags) ->
-    @generateIterationForStatement "in", stmt, (if flags & F_SEMICOLON_OPT then S_TFFT else S_TFFF)
+    @generateIterationForStatement "in", stmt, 
+      (if flags & F_SEMICOLON_OPT then S_TFFT else S_TFFF)
 
   ForOfStatement: (stmt, flags) ->
-    @generateIterationForStatement "of", stmt, (if flags & F_SEMICOLON_OPT then S_TFFT else S_TFFF)
+    @generateIterationForStatement "of", stmt, 
+      (if flags & F_SEMICOLON_OPT then S_TFFT else S_TFFF)
 
   LabeledStatement: (stmt, flags) ->
-    [ stmt.label.name + ":", @maybeBlock(stmt.body, (if flags & F_SEMICOLON_OPT then S_TFFT else S_TFFF)) ]
+    [ stmt.label.name + ":", @maybeBlock(stmt.body, 
+      (if flags & F_SEMICOLON_OPT then S_TFFT else S_TFFF)) ]
 
-  Program: (stmt, flags) ->
+  Program: cT("Program:stmt,flags->~1198fcT") (stmt, flags) ->
     result = undefined
-    fragment = undefined
+    fragment = undefined 
     i = undefined
     iz = undefined
     bodyFlags = undefined
@@ -1216,7 +1274,7 @@ CodeGenerator.Statement =
       ++i
     result
 
-  FunctionDeclaration: (stmt, flags) ->
+  FunctionDeclaration: cT("aration:stmt,flags->~1224fcT") (stmt, flags) ->
     [ generateAsyncPrefix(stmt, true), "->", generateStarSuffix(stmt) or noEmptySpace(), generateIdentifier(stmt.id), @generateFunctionBody(stmt) ]
 
   ReturnStatement: (stmt, flags) ->
@@ -1242,8 +1300,9 @@ CodeGenerator.Statement =
     result
 
 merge CodeGenerator::, CodeGenerator.Statement
+
 CodeGenerator.Expression =
-  SequenceExpression: (expr, precedence, flags) ->
+  SequenceExpression: cT("r,precedence,flags->~1251fcT") (expr, precedence, flags) ->
     result = undefined
     i = undefined
     iz = undefined
@@ -1537,13 +1596,13 @@ CodeGenerator.Expression =
     result.push "}"
     result
 
-  ThisExpression: (expr, precedence, flags) ->
+  ThisExpression: cT("r,precedence,flags->~1545fcT") (expr, precedence, flags) ->
     "this"
 
   Super: (expr, precedence, flags) ->
     "super"
 
-  Identifier: (expr, precedence, flags) ->
+  Identifier: cT("r,precedence,flags->~1551fcT") (expr, precedence, flags) ->
     generateIdentifier expr
 
   ImportDefaultSpecifier: (expr, precedence, flags) ->
@@ -1565,7 +1624,7 @@ CodeGenerator.Expression =
     result.push noEmptySpace() + "as" + noEmptySpace() + generateIdentifier(id)  if id and id.name isnt exported
     result
 
-  Literal: (expr, precedence, flags) ->
+  Literal: cT("r,precedence,flags->~1573fcT") (expr, precedence, flags) ->
     raw = undefined
     if expr.hasOwnProperty("raw") and parse and extra.raw
       try
@@ -1656,7 +1715,8 @@ CodeGenerator.Expression =
     @Literal expr, precedence, flags
 
 merge CodeGenerator::, CodeGenerator.Expression
-CodeGenerator::generateExpression = (expr, precedence, flags) ->
+
+CodeGenerator::generateExpression = cT("r,precedence,flags->~1664fcT") (expr, precedence, flags) ->
   result = undefined
   type = undefined
   type = expr.type or Syntax.Property
@@ -1665,13 +1725,17 @@ CodeGenerator::generateExpression = (expr, precedence, flags) ->
   result = addComments(expr, result)  if extra.comment
   toSourceNodeWhenNeeded result, expr
 
-CodeGenerator::generateStatement = (stmt, flags) ->
+CodeGenerator::generateStatement = cT("atement=stmt,flags->~1673fcT") (stmt, flags) ->
   result = undefined
   fragment = undefined
   result = this[stmt.type](stmt, flags)
-  result = addComments(stmt, result)  if extra.comment
+  if extra.comment
+    result = addComments(stmt, result)  
   fragment = toSourceNodeWhenNeeded(result).toString()
-  result = (if sourceMap then toSourceNodeWhenNeeded(result).replaceRight(/\s+$/, "") else fragment.replace(/\s+$/, ""))  if stmt.type is Syntax.Program and not safeConcatenation and newline is "" and fragment.charAt(fragment.length - 1) is "\n"
+  if stmt.type is Syntax.Program and not safeConcatenation and 
+       newline is "" and fragment.charAt(fragment.length - 1) is "\n"
+    result = (if sourceMap then toSourceNodeWhenNeeded(result).replaceRight(/\s+$/, "") \
+              else fragment.replace(/\s+$/, ""))  
   toSourceNodeWhenNeeded result, stmt
 
 FORMAT_MINIFY =
@@ -1694,3 +1758,65 @@ exports.Precedence = updateDeeply({}, Precedence)
 exports.browser = false
 exports.FORMAT_MINIFY = FORMAT_MINIFY
 exports.FORMAT_DEFAULTS = FORMAT_DEFAULTS
+
+
+`
+/*
+  automatically inserted coffee-trace function
+ */
+function cT(info) {//;
+var file, fileParts, infoParts, line, log2file, pfx, snip, type,
+  slice = [].slice;
+
+fileParts = /(\\|\/)([^\\\/]*)\.[^\.]*$/.exec(__filename);
+
+file = (fileParts ? fileParts[2] : '');
+
+infoParts = info.split('~');
+
+snip = infoParts[0];
+
+line = ':' + infoParts[1].slice(0, -3);
+
+type = infoParts[1].slice(-3, -2);
+
+file = file.slice(0, 15 - line.length) + line;
+
+while (file.length < 15) {
+  file += ' ';
+}
+
+pfx = function() {
+  var date, s100, secs;
+  date = new Date();
+  secs = date.getSeconds();
+  secs = '' + (secs < 10 ? '0' + secs : secs);
+  s100 = Math.floor(date.getMilliseconds() / 10);
+  s100 = '' + (s100 < 10 ? '0' + s100 : s100);
+  return secs + '.' + s100 + ' ' + file + ' (' + snip + ')';
+}; 
+log2file = function(args) {
+  // log('log2file', require('path').join(__dirname, 'coffee-trace.log'));
+  require('fs').appendFileSync(require('path').join(__dirname, 'coffee-trace.log'), pfx() + ' ' + require('util').inspect(args, {
+    depth: null
+  }).replace(/\s+/g, ' ') + '\n');
+};
+
+return function(arg) {
+  if (type === 'f') {
+    return function() {
+      var args;
+      args = 1 <= arguments.length ? slice.call(arguments, 0) : [];
+      console.log(pfx(), args);
+      log2file(args);
+      return arg.apply(this, args);
+    };
+  } else {
+    console.log(pfx(), [arg]);
+    log2file([arg]);
+    return arg;
+  }
+};
+
+};
+`

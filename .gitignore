@@ -5,3 +5,4 @@ js-whitespaces
 js-out.js
 js-generated.jsw
 js-in-ast.json
+*.log
