@@ -1,16 +1,3 @@
 node_modules
-js-tokens
-js-comments
-js-whitespaces
-js-out.js
-js-generated.jsw
-js-in-ast.json
 *.log
-comments
-final.jsw
-in-ast.json
-jswIndexes.json
-srcNodes.txt
-tokens
-whitespaces
-js-in.js
+test

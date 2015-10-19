@@ -1,4 +1,12 @@
 
+###
+  genJSW.coffee
+  generates JSW code from JS AST
+  this is a butchered version of escodegen
+    https://github.com/estools/escodegen
+    commit: fc99fcda78aabf949c1c94c0058bdc1cf0278d8a
+###
+
 log    = require('debug') 'genjsw'
 fs     = require 'fs'
 crypto = require 'crypto'
