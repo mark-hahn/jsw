@@ -13,11 +13,11 @@ genJSW  = require './genJSW'
 whitespace = require './whitespace'
   
 for file in args.files   
-  pfx = 'test/' + file + '-'
-  jsIn = fs.readFileSync pfx + 'in.js', 'utf8'
+  pfx = 'test/'
+  jsIn = fs.readFileSync file, 'utf8'
 
   comments = tokens = whitespaces = null
-  
+   
   if args.parse 
     comments   = []
     tokens     = []
@@ -25,16 +25,20 @@ for file in args.files
       ecmaVersion:       6
       sourceType:       'script' # 'module'
       allowHashBang:     yes
-      preserveParens:    yes
+      preserveParens:    no
       ranges:            yes 
       onComment:         comments
       onToken:           tokens
+      
     codegen.attachComments jsInAst, comments, tokens
     fs.writeFileSync pfx + 'in-ast.json', JSON.stringify jsInAst
     
-    generated = genJSW.generate jsInAst, comment: yes
+    generated = genJSW.generate jsInAst, 
+      comment: yes
+      sourceMap: yes
+      sourceMapWithCode: yes
     
-    fs.writeFileSync pfx + 'generated.jsw', generated
+    fs.writeFileSync pfx + 'final.jsw', generated.code
     
   else
     log 'not parse'

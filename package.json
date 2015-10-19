@@ -30,7 +30,9 @@
     "debug": "^2.2.0",
     "escodegen": "^1.7.0",
     "estraverse": "^4.1.0",
-    "esutils": "^2.0.2"
+    "esutils": "^2.0.2",
+    "rimraf": "^2.4.3",
+    "source-map": "^0.5.1"
   },
   "bin": {
     "jsw": "scripts/run"
