@@ -1,18 +1,12 @@
 #   -*-  grammar-ext: sh  -*-
 
+file="$1"
+file=${file:-"test/orig.js"}
+
 function block_for_change {
-  if [[ $(<"test/runarg") == genonly ]]; then 
-    echo "watching gen only"
-    inotifywait -qe modify src/* scripts/run test/*-in.js test/*-in-ast.json
-  else if [[ $(<"test/runarg") == parseonly ]]; then 
-    echo "watching parse only"
-    inotifywait -qe modify src/* scripts/run test/*-in.js
-  else 
-    inotifywait -qe modify src/* scripts/run test/*-in.js
-  fi
-fi
+  inotifywait -qe modify src/* scripts/run $file
 }
-bash scripts/run $(<"test/runarg")
+bash scripts/run $file
 while block_for_change; do
-  bash scripts/run $(<"test/runarg")
+  bash scripts/run $file
 done

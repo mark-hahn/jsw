@@ -34,9 +34,10 @@ for file in args.files
     fs.writeFileSync pfx + 'in-ast.json', JSON.stringify jsInAst
     
     generated = genJSW.generate jsInAst, 
-      comment: yes
-      sourceMap: yes
+      comment:           yes
+      sourceMap:         yes
       sourceMapWithCode: yes
+      file:              jsIn
     
     fs.writeFileSync pfx + 'final.jsw', generated.code
     

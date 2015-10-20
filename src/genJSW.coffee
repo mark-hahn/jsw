@@ -13,6 +13,7 @@ crypto = require 'crypto'
 rimraf = require 'rimraf'
 
 createSrcNodesFile = yes
+originalSourceCode = null
 
 Syntax = undefined
 Precedence = undefined
@@ -384,25 +385,23 @@ toSourceNodeWhenNeeded = (generated, node) ->
     if isArray(generated)
       generated = flattenToString(generated)
     return generated
-  
+   
   if not node?
     if generated instanceof SourceNode
       return generated
     else
       node = {} 
-      
+
   if not node.loc? 
     srcNode = new SourceNode null, null, sourceMap, generated, node.name or null
+    srcStr = srcNode.toString()
+    if node then node.jswSrc = srcStr
     if node and isStatement(node) and node.type isnt 'Program'
       if createSrcNodesFile
-        origCode ?= fs.readFileSync 'test/js-in.js', 'utf8'
-        fs.appendFileSync 'test/srcNodes.txt',  '\n##### ' + node.type + ': \n  ~' + 
-          origCode[node.start...node.end] + '~\n  ~' + srcNode.toString() + '~\n'
-      md5 = crypto.createHash('md5').update srcNode.toString()
-      jswIndexes.push jswIndex =
-        jswHash: md5.digest 'hex'
-        jsStart: node.start
-        jsEnd:   node.end
+        fs.appendFileSync 'test/srcNodes.txt',  
+          '\n##### ' + node.type + ': \n  ~' + 
+            originalSourceCode[node.start...node.end] + 
+            '~\n  ~' + srcStr + '~\n'
     return srcNode
     
   new SourceNode(node.loc.start.line, node.loc.start.column, 
@@ -703,7 +702,8 @@ generate = (node, options) ->
   sourceCode = options.sourceCode
   preserveBlankLines = options.format.preserveBlankLines and sourceCode isnt null
   extra = options
-  
+  originalSourceCode = options.file
+
   if sourceMap
     if not exports.browser
       SourceNode = require("source-map").SourceNode
