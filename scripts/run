@@ -4,14 +4,7 @@ set -e
 cd ~/dev/apps/jsw
 scripts/compile 
 export DEBUG=*
-if [[ $1 == genonly ]]; then 
-  echo "running gen only"
-  node lib/jsw.js -gtcw  js
-else if [[ $1 == parseonly ]]; then 
-    echo "running parse only"
-    node lib/jsw.js -ptcw "test/js-in.js"
-  else 
-    node lib/jsw.js -pgtcw "test/js-in.js"
-  fi 
-fi
-exit 0  # $?
+echo ">>>>>>>>>>>>>>>>>>>> running: $1"
+echo
+node lib/jsw.js -pgtcw $1
+exit $?

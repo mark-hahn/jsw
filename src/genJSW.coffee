@@ -13,6 +13,7 @@ crypto = require 'crypto'
 rimraf = require 'rimraf'
 
 createSrcNodesFile = yes
+originalSourceCode = null
 
 Syntax = undefined
 Precedence = undefined
@@ -362,6 +363,7 @@ escapeString = (str) ->
     result += String.fromCharCode(code)
     ++i
   result + quote
+  
 flattenToString = (arr) ->
   i = undefined
   iz = undefined
@@ -376,67 +378,103 @@ flattenToString = (arr) ->
     ++i
   result
 
+origCode   = null
 jswIndexes = []
-origCode = null
+jswTop     = type: 'root', src: '', end: 0
+jswStack   = [jswTop]
 
+jswPush = (nodeType) ->
+  jswTop = src: '', start: jswTop.end, end: jswTop.end, type: nodeType
+  jswTop.depth = jswStack.length
+  jswStack.push jswTop
+
+jswAdd = (node, src) ->
+  # log 'jswAdd1', JSON.stringify(jswTop), JSON.stringify(node), src
+  # if node? and CodeGenerator.Statement.hasOwnProperty node.type
+  base = stringRepeat ' ', jswTop.depth - 1
+  jswTop.src += base + flattenToString src
+  # log 'jswAdded', jswTop.type, '\n', jswTop.src, '\n', jswTop.depth, jswTop.start, jswTop.end
+  # if jswTop.src is 'a = 1a = 1'
+  #   console.trace()
+  #   process.exit 0
+  # log 'jswAdd2', JSON.stringify jswTop
+  src
+   
+jswPop = (pass) ->
+  log 'pass', '\n', flattenToString  pass
+  if CodeGenerator.Statement.hasOwnProperty jswTop.type
+    # md5 = crypto.createHash('md5').update jswTop.src
+    # jswTop.hash = md5.digest 'hex'
+    jswIndexes.push jswTop
+  len = jswTop.src.length
+  jswStack.pop()
+  jswTop = jswStack[jswStack.length-1]
+  jswTop.end += len
+  pass 
+  
 toSourceNodeWhenNeeded = (generated, node) ->
   if not sourceMap
     if isArray(generated)
       generated = flattenToString(generated)
-    return generated
-  
+    return jswAdd node, generated
+   
   if not node?
     if generated instanceof SourceNode
-      return generated
+      return jswAdd node, generated
     else
-      node = {} 
-      
+      node = {}  
+        
   if not node.loc? 
     srcNode = new SourceNode null, null, sourceMap, generated, node.name or null
+    srcStr = srcNode.toString()
+    if node then node.jswSrc = srcStr
+    jswAdd node, srcStr
     if node and isStatement(node) and node.type isnt 'Program'
       if createSrcNodesFile
-        origCode ?= fs.readFileSync 'test/js-in.js', 'utf8'
-        fs.appendFileSync 'test/srcNodes.txt',  '\n##### ' + node.type + ': \n  ~' + 
-          origCode[node.start...node.end] + '~\n  ~' + srcNode.toString() + '~\n'
-      md5 = crypto.createHash('md5').update srcNode.toString()
-      jswIndexes.push jswIndex =
-        jswHash: md5.digest 'hex'
-        jsStart: node.start
-        jsEnd:   node.end
+        fs.appendFileSync 'test/srcNodes.txt',  
+          '\n##### ' + node.type + ': \n  ~' + 
+            originalSourceCode[node.start...node.end] + 
+            '~\n  ~' + srcStr + '~\n' + JSON.stringify(jswTop) + '\n'
     return srcNode
     
-  new SourceNode(node.loc.start.line, node.loc.start.column, 
+  srcNode = new SourceNode(node.loc.start.line, node.loc.start.column, 
                  (if sourceMap is true then node.loc.source or null else sourceMap), 
                  generated, node.name or null)
                  
+  node.jswSrc = srcStr  
+  jswAdd node, srcStr
+  
+  srcNode
+  
 noEmptySpace = ->
   (if (space) then space else " ")
   
 join = (left, right) ->
+  jswPush 'join'
   leftSource = undefined
   rightSource = undefined
   leftCharCode = undefined
   rightCharCode = undefined
   leftSource = toSourceNodeWhenNeeded(left).toString()
   if leftSource.length is 0
-    return [ right ]  
+    return jswPop [ right ]  
   rightSource = toSourceNodeWhenNeeded(right).toString()
   if rightSource.length is 0
-    return [ left ]  
+    return jswPop [ left ]  
   leftCharCode = leftSource.charCodeAt(leftSource.length - 1)
   rightCharCode = rightSource.charCodeAt(0)
   if (leftCharCode is 0x2B or leftCharCode is 0x2D) and leftCharCode is rightCharCode or 
       esutils.code.isIdentifierPartES5(leftCharCode) and esutils.code.isIdentifierPartES5(rightCharCode) or 
       leftCharCode is 0x2F and rightCharCode is 0x69
-    return [ left, noEmptySpace(), right ]
+    return jswPop [ left, noEmptySpace(), right ]
   else 
     if esutils.code.isWhiteSpace(leftCharCode)     or 
        esutils.code.isLineTerminator(leftCharCode) or 
        esutils.code.isWhiteSpace(rightCharCode)    or 
        esutils.code.isLineTerminator(rightCharCode)
-      return [ left, right ] 
+      return jswPop [ left, right ] 
        
-  [ left, space, right ]
+  jswPop [ left, space, right ]
 
 addIndent = (stmt) ->
   [ base, stmt ]
@@ -457,6 +495,7 @@ calculateSpaces = (str) ->
   (str.length - 1) - i
 
 adjustMultilineComment = (value, specialBase) ->
+  jswPush 'adjustMultilineComment'
   array = undefined
   i = undefined
   len = undefined
@@ -491,7 +530,8 @@ adjustMultilineComment = (value, specialBase) ->
     array[i] = (if sourceMap then sn.join("") else sn)
     ++i
   base = previousBase
-  array.join "\n"
+  jswPop array.join "\n"
+  
 generateComment = (comment, specialBase) ->
   if comment.type is "Line"
     if endsWithLineTerminator(comment.value)
@@ -504,6 +544,7 @@ generateComment = (comment, specialBase) ->
   "/*" + comment.value + "*/"
   
 addComments = (stmt, result) ->
+  jswPush 'addComments'
   i = undefined
   len = undefined
   comment = undefined
@@ -596,7 +637,8 @@ addComments = (stmt, result) ->
           result = [ result, addIndent(generateComment(comment)) ]
         result = [ result, "\n" ]  if i isnt len - 1 and not endsWithLineTerminator(toSourceNodeWhenNeeded(result).toString())
         ++i
-  result
+  jswPop result
+  
 generateBlankLines = (start, end, result) ->
   j = undefined
   newlineCount = 0
@@ -625,6 +667,7 @@ generateVerbatimString = (string) ->
   result
   
 generateVerbatim = (expr, precedence) ->
+  jswPush 'generateVerbatim'
   verbatim = undefined
   result = undefined
   prec = undefined
@@ -635,12 +678,13 @@ generateVerbatim = (expr, precedence) ->
     result = generateVerbatimString(verbatim.content)
     prec = (if (verbatim.precedence?) then verbatim.precedence else Precedence.Sequence)
     result = parenthesize(result, prec, precedence)
-  toSourceNodeWhenNeeded result, expr
+  jswPop toSourceNodeWhenNeeded result, expr
   
 CodeGenerator = ->
   
 generateIdentifier = (node) ->
-  toSourceNodeWhenNeeded node.name, node
+  jswPush 'generateIdentifier'
+  jswPop toSourceNodeWhenNeeded node.name, node
   
 generateAsyncPrefix = (node, spaceRequired) ->
   (if node.async then "async" + (if spaceRequired then noEmptySpace() else space) else "")
@@ -685,6 +729,7 @@ generate = (node, options) ->
     options = defaultOptions
     indent = options.format.indent.style
     base = stringRepeat(indent, options.format.indent.base)
+  originalSourceCode = options.file
   json = options.format.json
   renumber = options.format.renumber
   hexadecimal = (if json then false else options.format.hexadecimal)
@@ -718,7 +763,6 @@ generate = (node, options) ->
       map: null
     return (if options.sourceMapWithCode then pair else pair.code)
   
-  
   fs.writeFileSync 'test/jswIndexes.json', JSON.stringify jswIndexes
     
   pair = result.toStringWithSourceMap(
@@ -748,13 +792,18 @@ CodeGenerator::maybeBlock = (stmt, flags) ->
   result
 
 CodeGenerator::maybeBlockSuffix = (stmt, result) ->
+  jswPush 'CodeGenerator::maybeBlockSuffix'
   ends = endsWithLineTerminator(toSourceNodeWhenNeeded(result).toString())
-  return [ result, space ]  if stmt.type is Syntax.BlockStatement and (not extra.comment or not stmt.leadingComments) and not ends
-  return [ result, base ]  if ends
-  [ result, newline, base ]
+  if stmt.type is Syntax.BlockStatement and 
+      (not extra.comment or not stmt.leadingComments) and not ends
+    return jswPop [ result, space ]  
+  if ends
+    return jswPop [ result, base ]  
+  jswPop [ result, newline, base ]
 
 CodeGenerator::generatePattern = (node, precedence, flags) ->
-  return generateIdentifier(node)  if node.type is Syntax.Identifier
+  if node.type is Syntax.Identifier
+    return generateIdentifier(node)  
   @generateExpression node, precedence, flags
 
 CodeGenerator::generateFunctionParams = (node) ->
@@ -844,6 +893,7 @@ CodeGenerator.Statement =
 
 ################ output block { } ##############
   BlockStatement: (stmt, flags) ->
+    jswPush 'BlockStatement'
     range = undefined
     content = undefined
     result = [ "", newline ] #  removed {
@@ -897,7 +947,7 @@ CodeGenerator.Statement =
         ++i
 
     result.push addIndent("") #  removed }
-    result
+    jswPop result
 
 
   BreakStatement: (stmt, flags) ->
@@ -953,7 +1003,8 @@ CodeGenerator.Statement =
     that = this
     withIndent ->
       guard = undefined
-      result = [ "catch" + space + "(", that.generateExpression(stmt.param, Precedence.Sequence, E_TTT), ")" ]
+      result = [ "catch" + space + "(", 
+                 that.generateExpression(stmt.param, Precedence.Sequence, E_TTT), ")" ]
       if stmt.guard
         guard = that.generateExpression(stmt.guard, Precedence.Sequence, E_TTT)
         result.splice 2, 0, " if ", guard
@@ -968,6 +1019,7 @@ CodeGenerator.Statement =
     "" #  removed ;
 
   ExportDeclaration: (stmt, flags) ->
+    jswPush 'ExportDeclaration'
     result = [ "export" ]
     bodyFlags = undefined
     that = this
@@ -978,8 +1030,9 @@ CodeGenerator.Statement =
         result = join(result, @generateStatement(stmt.declaration, bodyFlags))
       else
         result = join(result, @generateExpression(stmt.declaration, Precedence.Assignment, E_TTT) + @semicolon(flags))
-      return result
-    return join(result, @generateStatement(stmt.declaration, bodyFlags))  if stmt.declaration
+      return jswPop result
+    if stmt.declaration
+      return jswPop join(result, @generateStatement(stmt.declaration, bodyFlags))  
     if stmt.specifiers
       if stmt.specifiers.length is 0
         result = join(result, "{" + space + "}")
@@ -1006,7 +1059,7 @@ CodeGenerator.Statement =
         result = join(result, [ "from" + space, @generateExpression(stmt.source, Precedence.Sequence, E_TTT), @semicolon(flags) ])
       else
         result.push @semicolon(flags)
-    result
+    jswPop result
 
   ExportDefaultDeclaration: (stmt, flags) ->
     stmt.default = true
@@ -1016,6 +1069,7 @@ CodeGenerator.Statement =
     @ExportDeclaration stmt, flags
 
   ExpressionStatement: (stmt, flags) ->
+    jswPush 'ExpressionStatement'
     isClassPrefixed = (fragment) ->
       code = undefined
       return false  if fragment.slice(0, 5) isnt "class"
@@ -1056,13 +1110,17 @@ CodeGenerator.Statement =
       result = [ "(", result, ")" + @semicolon(flags) ]
     else
       result.push @semicolon(flags)
-    result
+    jswPop result
 
   ImportDeclaration: (stmt, flags) ->
+    jswPush 'ImportDeclaration'
     result = undefined
     cursor = undefined
     that = this
-    return [ "import", space, @generateExpression(stmt.source, Precedence.Sequence, E_TTT), @semicolon(flags) ]  if stmt.specifiers.length is 0
+    if stmt.specifiers.length is 0
+      return jswPop [ "import", space, 
+                      @generateExpression(stmt.source, Precedence.Sequence, E_TTT), 
+                      @semicolon(flags) ]  
     result = [ "import" ]
     cursor = 0
     if stmt.specifiers[cursor].type is Syntax.ImportDefaultSpecifier
@@ -1097,7 +1155,7 @@ CodeGenerator.Statement =
           result.push newline  unless endsWithLineTerminator(toSourceNodeWhenNeeded(result).toString())
           result.push base + "}" + space
     result = join(result, [ "from" + space, @generateExpression(stmt.source, Precedence.Sequence, E_TTT), @semicolon(flags) ])
-    result
+    jswPop result
  
   VariableDeclarator: (stmt, flags) ->
     itemFlags = (if (flags & F_ALLOW_IN) then E_TTT else E_FTT)
@@ -1183,6 +1241,7 @@ CodeGenerator.Statement =
     result
 
   SwitchStatement: (stmt, flags) ->
+    jswPush 'ImportDeclaration'
     result = undefined
     fragment = undefined
     i = undefined
@@ -1204,9 +1263,10 @@ CodeGenerator.Statement =
         result.push newline  unless endsWithLineTerminator(toSourceNodeWhenNeeded(fragment).toString())
         ++i
     result.push addIndent("}")
-    result
+    jswPop result
 
   SwitchCase: (stmt, flags) ->
+    jswPush 'SwitchCase'
     result = undefined
     fragment = undefined
     i = undefined
@@ -1232,8 +1292,7 @@ CodeGenerator.Statement =
         result.push fragment
         result.push newline  if i + 1 isnt iz and not endsWithLineTerminator(toSourceNodeWhenNeeded(fragment).toString())
         ++i
-
-    result
+    jswPop result
 
   IfStatement: (stmt, flags) ->
     result = undefined
@@ -1301,6 +1360,7 @@ CodeGenerator.Statement =
       (if flags & F_SEMICOLON_OPT then S_TFFT else S_TFFF)) ]
 
   Program: (stmt, flags) ->
+    jswPush 'Program'
     result = undefined
     fragment = undefined 
     i = undefined
@@ -1327,10 +1387,14 @@ CodeGenerator.Statement =
           not stmt.body[i].trailingComments  
         generateBlankLines stmt.body[i].range[1], stmt.range[1], result  
       ++i
-    result
+    jswPop result
 
   FunctionDeclaration: (stmt, flags) ->
-    [ generateAsyncPrefix(stmt, true), "->", generateStarSuffix(stmt) or noEmptySpace(), generateIdentifier(stmt.id), @generateFunctionBody(stmt) ]
+    jswPush 'FunctionDeclaration'
+    jswPop [generateAsyncPrefix(stmt, true), "->", 
+            generateStarSuffix(stmt) or noEmptySpace(), 
+            generateIdentifier(stmt.id), 
+            @generateFunctionBody(stmt)]
 
   ReturnStatement: (stmt, flags) ->
     return [ join("return", @generateExpression(stmt.argument, Precedence.Sequence, E_TTT)), @semicolon(flags) ]  if stmt.argument
@@ -1447,6 +1511,7 @@ CodeGenerator.Expression =
     parenthesize result, Precedence.New, precedence
 
   MemberExpression: (expr, precedence, flags) ->
+    jswPush 'MemberExpression'
     result = undefined
     fragment = undefined
     result = [ @generateExpression(expr.object, Precedence.Call, (if (flags & F_ALLOW_CALL) then E_TTF else E_TFF)) ]
@@ -1460,9 +1525,10 @@ CodeGenerator.Expression =
         result.push "."  if fragment.indexOf(".") < 0 and not (/[eExX]/).test(fragment) and esutils.code.isDecimalDigit(fragment.charCodeAt(fragment.length - 1)) and not (fragment.length >= 2 and fragment.charCodeAt(0) is 48)
       result.push "."
       result.push generateIdentifier(expr.property)
-    parenthesize result, Precedence.Member, precedence
+    jswPop parenthesize result, Precedence.Member, precedence
 
   UnaryExpression: (expr, precedence, flags) ->
+    jswPush 'UnaryExpression'
     result = undefined
     fragment = undefined
     rightCharCode = undefined
@@ -1484,7 +1550,7 @@ CodeGenerator.Expression =
           result.push fragment
         else
           result.push fragment
-    parenthesize result, Precedence.Unary, precedence
+    jswPop parenthesize result, Precedence.Unary, precedence
 
   YieldExpression: (expr, precedence, flags) ->
     result = undefined
@@ -1520,10 +1586,12 @@ CodeGenerator.Expression =
     @ArrayExpression expr, precedence, flags, true
 
   ArrayExpression: (expr, precedence, flags, isPattern) ->
+    jswPush 'ArrayExpression'
     result = undefined
     multiline = undefined
     that = this
-    return "[]"  unless expr.elements.length
+    if not expr.elements.length
+      return jswPop "[]"  
     multiline = (if isPattern then false else expr.elements.length > 1)
     result = [ "[", (if multiline then newline else "") ]
     withIndent (indent) ->
@@ -1545,7 +1613,7 @@ CodeGenerator.Expression =
     result.push newline  if multiline and not endsWithLineTerminator(toSourceNodeWhenNeeded(result).toString())
     result.push (if multiline then base else "")
     result.push "]"
-    result
+    jswPop result
 
   RestElement: (expr, precedence, flags) ->
     "..." + @generatePattern(expr.argument)
@@ -1582,16 +1650,18 @@ CodeGenerator.Expression =
     [ @generatePropertyKey(expr.key, expr.computed), ":" + space, @generateExpression(expr.value, Precedence.Assignment, E_TTT) ]
 
   ObjectExpression: (expr, precedence, flags) ->
+    jswPush 'ObjectExpression'
     multiline = undefined
     result = undefined
     fragment = undefined
     that = this
-    return "{}"  unless expr.properties.length
+    if not expr.properties.length
+      return jswPop "{}"  
     multiline = expr.properties.length > 1
     withIndent ->
       fragment = that.generateExpression(expr.properties[0], Precedence.Sequence, E_TTT)
-
-    return [ "{", space, fragment, space, "}" ]  unless hasLineTerminator(toSourceNodeWhenNeeded(fragment).toString())  unless multiline
+    if not multiline and not hasLineTerminator(toSourceNodeWhenNeeded(fragment).toString())  
+      return jswPop [ "{", space, fragment, space, "}" ]  
     withIndent (indent) ->
       i = undefined
       iz = undefined
@@ -1610,16 +1680,18 @@ CodeGenerator.Expression =
     result.push newline  unless endsWithLineTerminator(toSourceNodeWhenNeeded(result).toString())
     result.push base
     result.push "}"
-    result
+    jswPop result
 
   ObjectPattern: (expr, precedence, flags) ->
+    jswPush 'ObjectPattern'
     result = undefined
     i = undefined
     iz = undefined
     multiline = undefined
     property = undefined
     that = this
-    return "{}"  unless expr.properties.length
+    if not expr.properties.length
+      return jswPop "{}"  
     multiline = false
     if expr.properties.length is 1
       property = expr.properties[0]
@@ -1650,7 +1722,7 @@ CodeGenerator.Expression =
     result.push newline  if multiline and not endsWithLineTerminator(toSourceNodeWhenNeeded(result).toString())
     result.push (if multiline then base else "")
     result.push "}"
-    result
+    jswPop result
 
   ThisExpression: (expr, precedence, flags) ->
     "this"
@@ -1774,41 +1846,30 @@ merge CodeGenerator::, CodeGenerator.Expression
 
 
 CodeGenerator::generateExpression = (expr, precedence, flags) ->
+  jswPush 'CodeGenerator::generateExpression'
   result = undefined
   type = undefined
   type = expr.type or Syntax.Property
-  return generateVerbatim(expr, precedence)  if extra.verbatim and expr.hasOwnProperty(extra.verbatim)
+  if extra.verbatim and expr.hasOwnProperty(extra.verbatim)
+    return jswPop generateVerbatim(expr, precedence)  
   result = this[type](expr, precedence, flags)
   result = addComments(expr, result)  if extra.comment
-  toSourceNodeWhenNeeded result, expr
+  jswPop toSourceNodeWhenNeeded result, expr
 
-jswIndexes = []
-    
+
 CodeGenerator::generateStatement = (stmt, flags) ->
-  # jswIndex = 
-  #   type:     stmt.type
-  #   jsStart:  stmt.start
-  #   jsEnd:    stmt.end
-  #   jswStart: jswLen 
-  # jswIndexes.push jswIndex
-  
+  jswPush 'CodeGenerator::generateStatement'
   result = undefined
   fragment = undefined
   result = this[stmt.type](stmt, flags)
   if extra.comment
     result = addComments(stmt, result)  
   fragment = toSourceNodeWhenNeeded(result).toString()
-  
-  # jswIndex.jswEnd = jswIndex.jswStart + fragment.length
-  # 
-  # if stmt.type is 'Program'
-  #   log jswIndexes
-  
   if stmt.type is Syntax.Program and not safeConcatenation and 
        newline is "" and fragment.charAt(fragment.length - 1) is "\n"
     result = (if sourceMap then toSourceNodeWhenNeeded(result).replaceRight(/\s+$/, "") \
               else fragment.replace(/\s+$/, ""))  
-  toSourceNodeWhenNeeded result, stmt
+  jswPop toSourceNodeWhenNeeded result, stmt
 
 
 FORMAT_MINIFY =
