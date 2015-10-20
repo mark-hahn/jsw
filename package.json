@@ -24,15 +24,10 @@
   },
   "homepage": "https://github.com/mark-hahn/jsw",
   "dependencies": {
-    "acorn": "^2.4.0",
-    "acorn-jsw": "^2.0.0",
     "argparse": "^1.0.2",
     "debug": "^2.2.0",
-    "escodegen": "^1.7.0",
-    "estraverse": "^4.1.0",
-    "esutils": "^2.0.2",
     "rimraf": "^2.4.3",
-    "source-map": "^0.5.1"
+    "uglify-js2": "^2.1.11"
   },
   "bin": {
     "jsw": "scripts/run"
