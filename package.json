@@ -27,6 +27,7 @@
     "argparse": "^1.0.2",
     "debug": "^2.2.0",
     "rimraf": "^2.4.3",
+    "source-map": "^0.5.1",
     "uglify-js2": "^2.1.11"
   },
   "bin": {
