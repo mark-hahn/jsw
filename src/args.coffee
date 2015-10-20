@@ -2,51 +2,34 @@
 getArgs = ->
 
   parser = new (require('argparse').ArgumentParser)
-    version: "0.0.1"
+    version: JSON.parse(require('fs').readFileSync 'package.json', 'utf8').version
     addHelp: true
     description: 
-      "A translator for an alternate Javascript syntax that uses significant whitespace"
+      "A translator for an alternate Javascript syntax that uses significant whitespace. 
+       A .js file is a javascript file up to es6. A .jsw file is the alternate syntax version.
+      The two files operated on have file names that only differ in the suffix.
+      This utility translates to/from these two types. "
 
-  parser.addArgument ['-p', '--parse' ], 
+  parser.addArgument ['-w', '--tojsw' ], 
     nargs: 0
     action: 'storeTrue'
-    help: 'Parse .js file to .ast'
+    help: 'Translate js file to a jsw file.'
  
-  parser.addArgument ['-g', '--gen' ], 
+  parser.addArgument ['-t', '--tojs' ], 
     nargs: 0
     action: 'storeTrue'
-    help: 'Generate .js file from .ast'
-  
-  parser.addArgument ['-f', '--tojsw' ], 
-    nargs: 0
-    action: 'storeTrue'
-    help: 'Translate .js files to .jsw (forward, default is .jsw to .js).'
+    help: 'Translate jsw file to a js file.'
  
-  parser.addArgument ['-t', '--tokens' ], 
+  parser.addArgument ['-m', '--map' ], 
     nargs: 0
     action: 'storeTrue'
-    help: 'Write tokens file.'
+    help: 'Create map file.'
  
-  parser.addArgument ['-c', '--comments' ], 
+  parser.addArgument ['-a', '--auto' ], 
     nargs: 0
     action: 'storeTrue'
-    help: 'Write comments file.'
+    help: 'Translate older js or jsw file to the other type.'
  
-  parser.addArgument ['-w', '--whitespace' ], 
-    nargs: 0
-    action: 'storeTrue'
-    help: 'Write whitespace file.'
- 
-  parser.addArgument ['-s', '--safe'  ], 
-    nargs: 0
-    action: 'storeTrue'
-    help: "Don't overwrite existing files."
-
-  parser.addArgument ['-d', '--delete'], 
-    nargs: 0
-    action: 'storeTrue'
-    help: 'Delete .jws file if newer .js file exists.'
-
   parser.addArgument ['files'], 
     nargs: '*'
     help: 'Files to translate.'

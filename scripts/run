@@ -4,7 +4,5 @@ set -e
 cd ~/dev/apps/jsw
 scripts/compile 
 export DEBUG=*
-echo ">>>>>>>>>>>>>>>>>>>> running: $1"
-echo
-node lib/jsw.js -pgtcw $1
+node lib/jsw.js -w $1
 exit $?
