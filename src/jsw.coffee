@@ -21,7 +21,7 @@ for file in args.files
   if args.parse 
     comments   = []
     tokens     = []
-    jsInAst = acorn.parse jsIn,
+    ast = acorn.parse jsIn,
       ecmaVersion:       6
       sourceType:       'script' # 'module'
       allowHashBang:     yes
@@ -29,32 +29,33 @@ for file in args.files
       ranges:            yes 
       onComment:         comments
       onToken:           tokens
-      
-    codegen.attachComments jsInAst, comments, tokens
-    fs.writeFileSync pfx + 'in-ast.json', JSON.stringify jsInAst
+       
+    codegen.attachComments ast, comments, tokens
+    fs.writeFileSync file + '-ast.json', JSON.stringify ast
     
-    generated = genJSW.generate jsInAst, 
+    generated = genJSW.generate ast, 
       comment: yes
-      sourceMap: yes
-      sourceMapWithCode: yes
-    
+      # sourceMap: yes
+      # sourceMapWithCode: yes
+      file: jsIn
+    fs.writeFileSync 'test/jsw-ast.json', JSON.stringify ast
     fs.writeFileSync pfx + 'final.jsw', generated.code
     
-  else
-    log 'not parse'
-    jsInAst = JSON.parse fs.readFileSync pfx + 'in-ast.json', 'utf8'
-    
-  if args.comments and comments 
-    fs.writeFileSync pfx + 'comments', util.inspect comments, depth: null
-  if args.tokens   and tokens 
-    fs.writeFileSync pfx + 'tokens',   util.inspect tokens,   depth: null
-  if args.comments and comments and args.tokens and tokens
-    whitespaces = whitespace.get jsIn, tokens, comments
-    fs.writeFileSync pfx + 'whitespaces', util.inspect whitespaces,   depth: null
-
-  if args.gen
-    jsOut = codegen.generate jsInAst, 
-      comment:  true
-      # verbatim: 'x-verbatim-property'
-      
-    fs.writeFileSync pfx + 'out.js', jsOut
+  # else
+  #   log 'not parse'
+  #   ast = JSON.parse fs.readFileSync pfx + 'in-ast.json', 'utf8'
+  #   
+  # if args.comments and comments 
+  #   fs.writeFileSync pfx + 'comments', util.inspect comments, depth: null
+  # if args.tokens   and tokens 
+  #   fs.writeFileSync pfx + 'tokens',   util.inspect tokens,   depth: null
+  # if args.comments and comments and args.tokens and tokens
+  #   whitespaces = whitespace.get jsIn, tokens, comments
+  #   fs.writeFileSync pfx + 'whitespaces', util.inspect whitespaces,   depth: null
+  # 
+  # if args.gen
+  #   jsOut = codegen.generate ast, 
+  #     comment:  true
+  #     # verbatim: 'x-verbatim-property'
+  #     
+  #   fs.writeFileSync pfx + 'out.js', jsOut
