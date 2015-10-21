@@ -19,8 +19,8 @@ dumpAst = (ast) ->
   ast
      
 for file in args.files  
-  log ">>", "translating: " + file
-     
+  console.log "\nvvvvvvvvvvvvvvvvvv"
+      
   pfx = 'test/'
   jsIn = fs.readFileSync file, 'utf8'
      
@@ -28,8 +28,15 @@ for file in args.files
     ast = dumpAst Uglify.parse jsIn
     fs.writeFileSync pfx + 'in-ast.json', JSON.stringify ast
        
-    streamOpts = beautify:yes, indent_level: 2
-    
+    node_map = add: (type, origStart, origEnd, genStart, genEnd) ->
+      log 'node_mapping', {type, origStart, origEnd, genStart, genEnd}
+      
+    streamOpts = {
+      beautify:yes, 
+      indent_level: 2, 
+      node_map
+    } 
+     
     if args.map
       source_map = Uglify.SourceMap()
       streamOpts.source_map = source_map
@@ -55,5 +62,5 @@ for file in args.files
     if args.map
       fs.writeFileSync pfx + 'map.json', source_map.toString()
     
-  log ">>", "finshed: " + file
+  console.log "^^^^^^^^^^^^^^^^^^\n" 
     
