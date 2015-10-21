@@ -8,7 +8,7 @@ fs        = require 'fs'
 util      = require 'util'
 args      = require './args'
 Uglify    = require "uglify-js2"
-   
+    
 dumpAst = (ast) ->
   tt = new Uglify.TreeTransformer null, (node) ->
     node.startPos = node.start.pos
@@ -32,8 +32,13 @@ for file in args.files
     ast = dumpAst Uglify.parse jsIn
     fs.writeFileSync pfx + 'in-ast.json', JSON.stringify ast
        
-    node_map = add: (type, origStart, origEnd, genStart, genEnd) ->
-      log 'node_mapping', {type, origStart, origEnd, genStart, genEnd}
+    node_map = add: (node_gen_map) ->
+      log 'node_mapping', 
+        node_gen_map.type,
+        node_gen_map.orig_start_pos,
+        node_gen_map.orig_end_pos,
+        node_gen_map.gen_start_pos
+        node_gen_map.gen_end_pos
       
     streamOpts = {
       beautify:yes, 
@@ -47,7 +52,7 @@ for file in args.files
       
     out  = Uglify.OutputStream streamOpts
     ast.print out
-    log util.inspect ast
+    # log util.inspect ast
     fs.writeFileSync pfx + 'out.js', out.toString()
      
     # streamOpts = beautify:yes, indent_level: 2
