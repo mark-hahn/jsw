@@ -11,13 +11,17 @@ Uglify    = require "uglify-js2"
    
 dumpAst = (ast) ->
   tt = new Uglify.TreeTransformer null, (node) ->
+    node.startPos = node.start.pos
+    node.endPos = node.end.pos
     delete node.start
     delete node.end
     node.type = node.TYPE
+    if not node.body? or node.body.length is 0
+      delete node.body
     node
   fs.writeFileSync pfx + 'dump.json', JSON.stringify ast.transform tt
   ast
-     
+      
 for file in args.files  
   console.log "\nvvvvvvvvvvvvvvvvvv"
       
@@ -43,6 +47,7 @@ for file in args.files
       
     out  = Uglify.OutputStream streamOpts
     ast.print out
+    log util.inspect ast
     fs.writeFileSync pfx + 'out.js', out.toString()
      
     # streamOpts = beautify:yes, indent_level: 2
