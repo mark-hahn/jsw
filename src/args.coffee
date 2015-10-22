@@ -23,7 +23,7 @@ getArgs = ->
   parser.addArgument ['-m', '--map' ], 
     nargs: 0
     action: 'storeTrue'
-    help: 'Create map file.'
+    help: 'Create or use map to enable lossless restore to js.'
  
   parser.addArgument ['-a', '--auto' ], 
     nargs: 0

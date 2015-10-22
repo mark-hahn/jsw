@@ -4,5 +4,5 @@ set -e
 cd ~/dev/apps/jsw
 scripts/compile 
 export DEBUG=*
-node lib/jsw.js -w $1
+node lib/jsw.js $@
 exit $?

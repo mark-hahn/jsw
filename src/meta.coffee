@@ -25,12 +25,12 @@ exports.encode = (jsCode, jswCode, jswMappings) ->
     hash.update jswCode[gen_start_pos...gen_end_pos]
     key = type + '-' + hash.digest 'hex'
     metaMap = {start: orig_start_pos, end: orig_end_pos, gen_start_pos, gen_end_pos}
-    if (val = meta[key])
+    if not (val = meta[key])
+      meta[key] = metaMap
+    else
       if not Array.isArray val
         meta[key] = [ addContexts val ]
       meta[key].push addContexts metaMap
-    else
-      meta[key] = metaMap
   for key, val of meta
     if not Array.isArray val
       delete val.gen_start_pos
@@ -39,6 +39,7 @@ exports.encode = (jsCode, jswCode, jswMappings) ->
       for val2 in val
         delete val2.gen_start_pos
         delete val2.gen_end_pos
+        
   metaJson = JSON.stringify meta
   fs.writeFileSync 'test/meta.json', metaJson
   
@@ -46,5 +47,5 @@ exports.encode = (jsCode, jswCode, jswMappings) ->
   metaLines = ''
   for idx in [0..9e9] by 80 when idx < base64.length
     metaLines += '#' + base64[idx...idx+80] + '\n'
-  '\n\n### metadata to translate jsw to js losslessly (vers 1) ###\n' + metaLines     
+  '\n\n### metadata to restore jsw to js losslessly (vers 1) ###\n' + metaLines     
      
