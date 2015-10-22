@@ -1,7 +1,7 @@
 #   -*-  grammar-ext: sh  -*-
 
 file="$1"
-file=${file:-"test/orig.js"}
+file=${file:-"test/jsCode.js"}
 
 function block_for_change {
   inotifywait -qe modify src/* scripts/run /root/dev/apps/UglifyJS2/lib/jsw-output.js $file
