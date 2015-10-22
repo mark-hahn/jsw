@@ -10,12 +10,12 @@ getArgs = ->
       The two files operated on have file names that only differ in the suffix.
       This utility translates to/from these two types. "
 
-  parser.addArgument ['-w', '--tojsw' ], 
+  parser.addArgument ['-t', '--tojsw' ], 
     nargs: 0
     action: 'storeTrue'
     help: 'Translate js file to a jsw file.'
  
-  parser.addArgument ['-t', '--tojs' ], 
+  parser.addArgument ['-f', '--fromjsw' ], 
     nargs: 0
     action: 'storeTrue'
     help: 'Translate jsw file to a js file.'

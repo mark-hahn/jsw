@@ -1,7 +1,7 @@
 
 log    = require('debug') 'utils'
 fs     = require 'fs'
-Uglify = require "uglify-js2"
+Uglify = require "uglify-js2-tojsw"
 
 exports.dumpAst = (ast) ->
   tt = new Uglify.TreeTransformer null, (node) ->

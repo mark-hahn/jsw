@@ -28,7 +28,8 @@
     "debug": "^2.2.0",
     "rimraf": "^2.4.3",
     "source-map": "^0.5.1",
-    "uglify-js2": "^2.1.11"
+    "uglify-js2-tojsw":   "*",
+    "uglify-js2-fromjsw": "*"
   },
   "bin": {
     "jsw": "scripts/run"

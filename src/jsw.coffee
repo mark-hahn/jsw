@@ -3,20 +3,20 @@
   A translator for an alternate Javascript syntax that uses significant whitespace
 ###  
 
-log    = require('debug') 'jsw'
-fs     = require 'fs'
-utils  = require './utils'
-args   = require './args'
-Uglify = require "uglify-js2"
-meta   = require './meta'
-
+log     = require('debug') 'jsw'
+fs      = require 'fs'
+utils   = require './utils'
+args    = require './args'
+UglifyT = require "uglify-js2-tojsw"
+UglifyF = require "uglify-js2-fromjsw"
+meta    = require './meta'
+ 
 for file in args.files  
   console.log "\nvvvvvvvvvvvvvvvvvv"
-      
-  jsCode = fs.readFileSync file, 'utf8'
      
   if args.tojsw 
-    ast = Uglify.parse jsCode
+    codeIn = fs.readFileSync file + '.js', 'utf8'
+    ast = UglifyT.parse codeIn
     utils.dumpAst ast
     fs.writeFileSync 'test/ast.json', JSON.stringify ast
        
@@ -24,14 +24,23 @@ for file in args.files
     if args.map
       jswMappings = []
       opts.node_map = add: (node_gen_map) -> jswMappings.push node_gen_map
+    codeOut = ast.print_to_string opts
+    metaStr = (if args.map then meta.encode codeIn, codeOut, jswMappings else '')
+    fs.writeFileSync file + '.jsw', codeOut + metaStr
       
-    jswCodeStream  = Uglify.OutputStream opts
-    ast.print jswCodeStream
-    jswCode = jswCodeStream.toString()
-    
-    metaStr = (if args.map then meta.encode jsCode, jswCode, jswMappings else '')
-    
-    fs.writeFileSync 'test/jswCode.jsw', jswCode + metaStr
+  if args.fromjsw
+    codeIn = fs.readFileSync file + '.jsw', 'utf8'
+    ast = UglifyF.parse codeIn
+    utils.dumpAst ast
+    fs.writeFileSync 'test/ast.json', JSON.stringify ast
+       
+    opts = beautify:yes, indent_level: 2
+    # if args.map
+    #   jswMappings = []
+    #   opts.node_map = add: (node_gen_map) -> jswMappings.push node_gen_map
+    codeOut = ast.print_to_string opts
+    # metaStr = (if args.map then meta.encode codeIn, codeOut, jswMappings else '')
+    fs.writeFileSync file + '.js', codeOut
       
   console.log "^^^^^^^^^^^^^^^^^^\n" 
     
