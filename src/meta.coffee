@@ -49,3 +49,17 @@ exports.encode = (jsCode, jswCode, jswMappings) ->
     metaLines += '#' + base64[idx...idx+80] + '\n'
   '\n\n### metadata to restore jsw to js losslessly (vers 1) ###\n' + metaLines     
      
+exports.decode = (jswCode, metaText) ->
+  try
+    if not metaText
+      if not (match = 
+          /([\s\S]*)###\smetadata\sto\srestore\sjsw\sto\sjs.*\s(\d+)\)([\s\S]*)/
+          .exec jswCode) or +match[2] isnt 1
+        throw 'no match in exports.decode'
+      metaText = match[3]
+    base64 = metaText.replace /[\s\n\r#]/g, ''
+    [match[1], zlib.inflateSync(new Buffer base64, 'base64').toString()]
+  catch e
+    log e
+    null
+

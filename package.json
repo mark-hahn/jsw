@@ -25,11 +25,12 @@
   "homepage": "https://github.com/mark-hahn/jsw",
   "dependencies": {
     "argparse": "^1.0.2",
+    "chalkline": "0.0.4",
     "debug": "^2.2.0",
     "rimraf": "^2.4.3",
     "source-map": "^0.5.1",
-    "uglify-js2-tojsw":   "*",
-    "uglify-js2-fromjsw": "*"
+    "uglify-js2-fromjsw": "*",
+    "uglify-js2-tojsw": "*"
   },
   "bin": {
     "jsw": "scripts/run"

@@ -77,7 +77,7 @@ function func1 (arg1, arg2) {
   - All statements are expressions
   - Ranges
   - `this` reference in params and object declrations
-  - Matching ES6 features often have different syntax (e.g. interpolation)
+  - Matching ES6 features often have different syntax (e.g. string interpolation)
   - Combined comparison (0 < x < 1)
   
 ### JSW to JS Text Mapping
@@ -86,7 +86,11 @@ When JS is converted to JSW, a compact set of metadata is added to the bottom of
 
 ### Status is Pre-Alpha
 
-Coding in progress.  Nothing useful yet.
+Nothing useful yet.  I'm close to being able to demonstrate the round-trip translation that preserves the JS formatting.
+
+### Helping Development
+
+The test environment is complex at the moment.  You can't just clone the repo and start testing.  I have two different forks of the Uglify parser/generator, one for each translation direction.  But I will gladly explain to anyone how to install my setup  And I will work on making it a simple install asap.  (I'm also interested in ideas on how to simplify all the forking).
 
 ### License
 

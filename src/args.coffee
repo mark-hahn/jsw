@@ -25,10 +25,10 @@ getArgs = ->
     action: 'storeTrue'
     help: 'Create or use map to enable lossless restore to js.'
  
-  parser.addArgument ['-a', '--auto' ], 
+  parser.addArgument ['-b', '--beautifyjs' ], 
     nargs: 0
     action: 'storeTrue'
-    help: 'Translate older js or jsw file to the other type.'
+    help: 'Beautify a js file into another js file (for testing).'
  
   parser.addArgument ['files'], 
     nargs: '*'
