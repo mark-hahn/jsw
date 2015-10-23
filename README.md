@@ -44,6 +44,14 @@ function func1 (arg1, arg2) {
 }
 ```
 
+### Installation
+
+This is not published in npm yet but installation is easy. Just clone this repo and run `npm install` in the repo folder.
+
+### Usage
+
+From the repo folder, run `scripts/run -tm test.js` to translate `test.js` *to* `test.jsw` with a map. Run `scripts/run -fm test.js` to translate *from* the new test.jsw to test.js. Run `scripts/run -h` to see all run options.
+
 ### JSW Overall Features
 
 - JSW syntax is much less noisy than the JS syntax, just like Coffeescript.  No more unnecessary parens and braces.  No typing of `function`.
@@ -86,11 +94,17 @@ When JS is converted to JSW, a compact set of metadata is added to the bottom of
 
 ### Status is Pre-Alpha
 
-Nothing useful yet.  I'm close to being able to demonstrate the round-trip translation that preserves the JS formatting.
+Not useful yet. The project is stable enough to run the round-trip translation. But the only language translation is `->` to/from `function`.  It also doesn't preserve the JS formatting when translating back to js, but the map is properly created in the .jsw file, ready to be used.
+
+The next step is adding the code to use the map and complete the round-trip formatting.  Then the only thing left to is hack the parser/generator to finish the new syntax.  I use the term "only" liberally (grin).
 
 ### Helping Development
 
-The test environment is complex at the moment.  You can't just clone the repo and start testing.  I have two different forks of the Uglify parser/generator, one for each translation direction.  But I will gladly explain to anyone how to install my setup  And I will work on making it a simple install asap.  (I'm also interested in ideas on how to simplify all the forking).
+Clone this repo and run `npm install` in the repo folder.  Edit the code in the `src` or `uglify` folder.  When you run `scripts/run` using the Usage instructions above, it will automatically compile the coffeescript to javascript before running.  This is obviously temporary until the pre-publish build process is added.
+
+### Worried about developing in Coffeescript?  
+
+Don't be!  The whole point of this project is to allow you to work in either coffeescript-like syntax or in real Javascript.  As soon as this utility is mature, it will be used to change this project to pure Javascript.  Everyone will then be able to work on it the way they want.
 
 ### License
 

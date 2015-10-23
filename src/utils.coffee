@@ -1,8 +1,8 @@
 
-log    = require('debug') 'utils'
-fs     = require 'fs'
-path   = require 'path'
-Uglify = require "uglify-js2-tojsw"
+log      = require('debug') 'utils'
+fs       = require 'fs'
+path     = require 'path'
+UglifyT0 = require '../uglify/tojsw/node'
 
 exports.checkFileExt = (file, ext) ->
   if path.extname(file).toLowerCase() isnt ext
@@ -11,7 +11,7 @@ exports.checkFileExt = (file, ext) ->
   [path.dirname(file) + '/' + fileBase, fileBase]
 
 exports.dumpAst = (ast, file) ->
-  tt = new Uglify.TreeTransformer null, (node) ->
+  tt = new UglifyT0.TreeTransformer null, (node) ->
     node.startPos = node.start.pos
     node.endPos = node.end.pos
     delete node.start 

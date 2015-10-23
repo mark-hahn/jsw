@@ -58,7 +58,7 @@ exports.decode = (jswCode, metaText) ->
         return []
       metaText = match[3]
     base64 = metaText.replace /[\s\n\r#]/g, ''
-    [match[1], zlib.inflateSync(new Buffer base64, 'base64').toString()]
+    [match[1], JSON.parse zlib.inflateSync(new Buffer base64, 'base64').toString()]
   catch e
     log e
     []

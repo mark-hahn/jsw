@@ -1,6 +1,6 @@
 {
   "name": "jsw",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Alternative Javascript syntax that uses significant whitespace",
   "main": "lib/jsw.js",
   "repository": {
@@ -27,10 +27,7 @@
     "argparse": "^1.0.2",
     "chalkline": "0.0.4",
     "debug": "^2.2.0",
-    "rimraf": "^2.4.3",
-    "source-map": "^0.5.1",
-    "uglify-js2-fromjsw": "*",
-    "uglify-js2-tojsw": "*"
+    "uglify-js2": "^2.1.11"
   },
   "bin": {
     "jsw": "scripts/run"

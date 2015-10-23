@@ -3,23 +3,22 @@
   A translator for an alternate Javascript syntax that uses significant whitespace
 ###  
 
-log     = require('debug') 'jsw'
-fs      = require 'fs'
-utils   = require './utils'
-args    = require './args'
-Uglify  = require 'uglify-js2'
-UglifyT = require 'uglify-js2-tojsw'
-UglifyF = require 'uglify-js2-fromjsw'
-meta    = require './meta'
-chlklin = require 'chalkline'
- 
+log        = require('debug') 'jsw'
+fs         = require 'fs'
+utils      = require './utils'
+args       = require './args'
+UglifyT0   = require '../uglify/tojsw/node'
+UglifyFrom = require '../uglify/fromjsw/node'
+meta       = require './meta'
+chlklin    = require 'chalkline'
+
 for file in args.files  
   chlklin.magenta()
   
   if args.tojsw 
     [fileNoExt, fileBase] = utils.checkFileExt file, '.js'
     codeIn = fs.readFileSync file, 'utf8'
-    ast = UglifyT.parse codeIn
+    ast = UglifyT0.parse codeIn
     utils.dumpAst ast, 'test/ast-dump.json'
     fs.writeFileSync 'test/ast.json', JSON.stringify ast
        
@@ -31,7 +30,9 @@ for file in args.files
     metaStr = (if args.map then meta.encode codeIn, codeOut, jswMappings else '')
     fs.writeFileSync fileNoExt + '.jsw', codeOut + metaStr
 
+  ## for debug only
   if args.beautifyjs 
+    Uglify = require 'uglify-js2'
     [fileNoExt, fileBase] = utils.checkFileExt file, '.js'
     codeIn = fs.readFileSync file, 'utf8'
     ast = Uglify.parse codeIn
@@ -47,13 +48,14 @@ for file in args.files
       [codeIn, metaObj] = meta.decode codeIn
       if not codeIn
         throw 'jsw metadata is missing, corrupted, or unknown version'
-    ast = UglifyF.parse codeIn
+      fs.writeFileSync 'test/meta.json', JSON.stringify metaObj ? {}
+      
+    ast = UglifyFrom.parse codeIn
     utils.dumpAst ast, 'test/ast-dump.json'
     fs.writeFileSync 'test/ast.json', JSON.stringify ast
        
     opts = beautify:yes, indent_level: 2
     codeOut = ast.print_to_string opts
-    fs.writeFileSync 'test/meta.json', JSON.stringify metaObj ? {}
     fs.writeFileSync fileNoExt + '.js', codeOut
 
   chlklin.blue()      

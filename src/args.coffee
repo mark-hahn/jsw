@@ -1,20 +1,20 @@
 
 getArgs = ->
-
+  
   parser = new (require('argparse').ArgumentParser)
     version: JSON.parse(require('fs').readFileSync 'package.json', 'utf8').version
     addHelp: true
     description: 
       "A translator for an alternate Javascript syntax that uses significant whitespace. 
-       A .js file is a javascript file up to es6. A .jsw file is the alternate syntax version.
-      The two files operated on have file names that only differ in the suffix.
+       A .js file is a javascript file up to es6. 
+       A .jsw file is the alternate syntax version.
       This utility translates to/from these two types. "
 
   parser.addArgument ['-t', '--tojsw' ], 
     nargs: 0
     action: 'storeTrue'
     help: 'Translate js file to a jsw file.'
- 
+  
   parser.addArgument ['-f', '--fromjsw' ], 
     nargs: 0
     action: 'storeTrue'

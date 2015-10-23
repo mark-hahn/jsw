@@ -1,7 +1,6 @@
 #   -*-  grammar-ext: sh  -*-
 
 set -e
-cd ~/dev/apps/jsw
 scripts/compile 
 export DEBUG=*
 node lib/jsw.js $@
