@@ -100,7 +100,9 @@ The next step is adding the code to use the map and complete the round-trip form
 
 ### Helping Development
 
-Clone this repo and run `npm install` in the repo folder.  Edit the code in the `src` or `uglify` folder.  When you run `scripts/run` using the Usage instructions above, it will automatically compile the coffeescript to javascript before running.  This is obviously temporary until the pre-publish build process is added.
+Clone this repo and run `npm install` in the repo folder.  Edit the code in the `src` or `uglify` folder.  When you run `scripts/run` using the Usage instructions above it will automatically compile the coffeescript to javascript before running.  This is obviously temporary until the pre-publish build process is added.
+
+Use `scripts/runw` (run and watch) instead of `scripts/run` and the test will be run again whenever and source file changes.
 
 ### Worried about developing in Coffeescript?  
 
