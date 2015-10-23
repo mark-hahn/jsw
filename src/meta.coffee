@@ -55,11 +55,11 @@ exports.decode = (jswCode, metaText) ->
       if not (match = 
           /([\s\S]*)###\smetadata\sto\srestore\sjsw\sto\sjs.*\s(\d+)\)([\s\S]*)/
           .exec jswCode) or +match[2] isnt 1
-        throw 'no match in exports.decode'
+        return []
       metaText = match[3]
     base64 = metaText.replace /[\s\n\r#]/g, ''
     [match[1], zlib.inflateSync(new Buffer base64, 'base64').toString()]
   catch e
     log e
-    null
+    []
 

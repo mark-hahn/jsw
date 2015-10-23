@@ -15,12 +15,12 @@ chlklin = require 'chalkline'
  
 for file in args.files  
   chlklin.magenta()
-  # console.log '\nvvvvvvvvvvvvvvvvvv'
   
   if args.tojsw 
-    codeIn = fs.readFileSync file + '.js', 'utf8'
+    [fileNoExt, fileBase] = utils.checkFileExt file, '.js'
+    codeIn = fs.readFileSync file, 'utf8'
     ast = UglifyT.parse codeIn
-    utils.dumpAst ast
+    utils.dumpAst ast, 'test/ast-dump.json'
     fs.writeFileSync 'test/ast.json', JSON.stringify ast
        
     opts = beautify:yes, indent_level: 2
@@ -29,31 +29,32 @@ for file in args.files
       opts.node_map = add: (node_gen_map) -> jswMappings.push node_gen_map
     codeOut = ast.print_to_string opts
     metaStr = (if args.map then meta.encode codeIn, codeOut, jswMappings else '')
-    fs.writeFileSync file + '.jsw', codeOut + metaStr
+    fs.writeFileSync fileNoExt + '.jsw', codeOut + metaStr
 
   if args.beautifyjs 
-    codeIn = fs.readFileSync file + '.js', 'utf8'
+    [fileNoExt, fileBase] = utils.checkFileExt file, '.js'
+    codeIn = fs.readFileSync file, 'utf8'
     ast = Uglify.parse codeIn
-    utils.dumpAst ast, 'test/b'
+    utils.dumpAst ast, 'test/ast-dump' + fileBase + '.json'
     fs.writeFileSync 'test/b-ast.json', JSON.stringify ast
     codeOut = ast.print_to_string beautify:yes
     fs.writeFileSync 'test/b-out.js', codeOut
       
   if args.fromjsw
-    codeIn = fs.readFileSync file + '.jsw', 'utf8'
+    [fileNoExt, fileBase] = utils.checkFileExt file, '.jsw'
+    codeIn = fs.readFileSync file, 'utf8'
     if args.map
       [codeIn, metaObj] = meta.decode codeIn
       if not codeIn
-        throw 'metadata in jsw file is missing or corrupted'
+        throw 'jsw metadata is missing, corrupted, or unknown version'
     ast = UglifyF.parse codeIn
-    utils.dumpAst ast
+    utils.dumpAst ast, 'test/ast-dump.json'
     fs.writeFileSync 'test/ast.json', JSON.stringify ast
        
     opts = beautify:yes, indent_level: 2
     codeOut = ast.print_to_string opts
     fs.writeFileSync 'test/meta.json', JSON.stringify metaObj ? {}
-    fs.writeFileSync file + '.js', codeOut
+    fs.writeFileSync fileNoExt + '.js', codeOut
 
   chlklin.blue()      
-  # console.log '^^^^^^^^^^^^^^^^^^\n' 
     
