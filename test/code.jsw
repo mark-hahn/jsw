@@ -1,9 +1,12 @@
 a = 1;
 b = 2;
+a = 1;
 c = 3;
+a = 1;
 
 ### metadata to restore jsw to js losslessly (vers 1) ###
-#eJxtz72KQkEMhuFbkdRHyPwlc0b2KrS0mUxyYEGPooONeO87hYWwVi9pHr484WG3OxQ3QbuoQYG6+dm4
-#3XGVUT/aRsMOJtj/nq8n2/fa7Wxr35JETZqMeRHD0bg4rchKQTJGD+UJ915vHQpOYKtCodd/JlgW70MV
-#izhLzszIZFJJnSPS5YPhN+PCF0fVBz+jy01idt5LyAnR4rhbZa0fjotvyOOADpfhPOy0JW5zGtM55aYu
-#UR4DOPraGsZElr48NIDXH7LbX04=
+#eJxlj0FrwzAMhf9K0DkFSXZsJ6Wn/oTutuxgxQpstElpTRmU/Pd5bC1hO70nwfuedIebXq7QUQ0f1/2c
+#FDqIO9r2k1S7iovGotX3Yiimn8wWaji8n85HPeSY9aRT3jixqUmNej+KYlE7UorokzMS0DJ0r3e45njJ
+#0GENOiXobA15Pu/zZ2ksSJnzj++nikvPFpb6mSH+DVG7SvUTV/QnamB5+3+f0SDMJopabCUE79E7legS
+#kXNphO5Z1TyaaPnPSYkNt0hhEBuIWUxoENWWeYg+xRWHH3+yL6CXuXBuetxYh8OAQqHVZkSHguSSaWO0
+#oydq/YqwAixfUyp8nw==

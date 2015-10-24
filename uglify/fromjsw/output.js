@@ -57,6 +57,7 @@ function OutputStream(options) {
         max_line_len     : 32000,
         beautify         : false,
         source_map       : null,
+        jsw_out_meta     : null,
         bracketize       : false,
         semicolons       : true,
         comments         : false,
@@ -322,7 +323,12 @@ function OutputStream(options) {
                 ccol: current_col,
                 name: name || ""
             })
-        }
+        } 
+    } : noop; 
+
+    var chk_jsw_out = options.jsw_out_meta ? function(node) {
+        // console.log('chk_jsw_out', options.jsw_out_meta.lookup(node));
+        return options.jsw_out_meta.lookup(node);
     } : noop;
 
     function get() {
@@ -358,6 +364,7 @@ function OutputStream(options) {
         with_parens     : with_parens,
         with_square     : with_square,
         add_mapping     : add_mapping,
+        chk_jsw_out     : chk_jsw_out,
         option          : function(opt) { return options[opt] },
         line            : function() { return current_line },
         col             : function() { return current_col },
@@ -383,6 +390,11 @@ function OutputStream(options) {
     };
 
     AST_Node.DEFMETHOD("print", function(stream, force_parens){
+        // console.log('print', this);
+        var code = this.chk_jsw_map(stream);
+        // console.log('code', code);
+        if (code) { stream.print(code); return }
+        
         var self = this, generator = self._codegen;
         function doit() {
             self.add_comments(stream);
@@ -1411,6 +1423,20 @@ function OutputStream(options) {
             output.newline();
         });
     };
+
+    /* -----[ jsw map output ]----- */
+    
+    AST_Node.DEFMETHOD("chk_jsw_map", noop);
+
+    function DEFJSWMAP(nodetype) {
+        nodetype.DEFMETHOD("chk_jsw_map", function(stream){
+          return stream.chk_jsw_out(this);
+        });
+    };
+    DEFJSWMAP(AST_Statement);
+    DEFJSWMAP(AST_LabeledStatement);
+    DEFJSWMAP(AST_SimpleStatement);
+    DEFJSWMAP(AST_BlockStatement);
 
     /* -----[ source map generators ]----- */
 
