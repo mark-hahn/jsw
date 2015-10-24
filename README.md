@@ -94,9 +94,9 @@ When JS is converted to JSW, a compact set of metadata is added to the bottom of
 
 ### Status is Pre-Alpha
 
-Not useful yet. The project is stable enough to run the round-trip translation. But the only language translation is `->` to/from `function`.  It also doesn't preserve the JS formatting when translating back to js, but the map is properly created in the .jsw file, ready to be used.
+Not useful yet. The round-trip translation works with format preservation. But the only language translation so far is `->` to/from `function`.
 
-The next step is adding the code to use the map and complete the round-trip formatting.  Then the only thing left to is hack the parser/generator to finish the new syntax.  I use the term "only" liberally (grin).
+The only thing left to do is hack the parser/generator to finish the new syntax.  I use the term "only" liberally (grin).
 
 ### Helping Development
 
